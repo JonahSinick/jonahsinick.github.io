@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Everyone Is Confident. Nobody Can Explain How.</title>
+<title>DRAFT IN PROGRESS — Everyone Is Confident. Nobody Can Explain How.</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -12,7 +12,7 @@
     background: #fafafa; color: #222; line-height: 1.7; font-size: 17px;
   }
   #sidebar {
-    position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+    position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
     overflow-y: auto; background: #fff; border-right: 1px solid #e0e0e0;
     padding: 28px 0 40px 0; z-index: 100;
   }
@@ -31,7 +31,7 @@
   #sidebar nav a.h2-link { font-weight: 600; color: #333; padding-top: 9px; padding-bottom: 9px; }
   #sidebar nav a.h2-link.active { color: #2563eb; font-weight: 700; }
   #sidebar nav a.h3-link { padding-left: 32px; font-size: 12.5px; color: #555; }
-  main { margin-left: 280px; padding: 52px 48px 80px 60px; }
+  main { margin-left: 260px; padding: 52px 48px 80px 60px; }
   .content { max-width: 800px; }
   h1 { font-size: 2.05rem; font-weight: 800; line-height: 1.25; color: #111; margin-bottom: 12px; letter-spacing: -0.02em; }
   .subtitle { font-size: 1.1rem; color: #555; font-style: italic; margin-bottom: 28px; line-height: 1.5; }
@@ -39,8 +39,6 @@
   h2 { font-size: 1.55rem; font-weight: 700; color: #1a1a2e; margin-top: 52px; margin-bottom: 18px; line-height: 1.3; padding-top: 8px; }
   h2::before { content: ""; display: block; width: 36px; height: 3px; background: #2563eb; margin-bottom: 10px; border-radius: 2px; }
   h3 { font-size: 1.18rem; font-weight: 700; color: #2a2a4a; margin-top: 36px; margin-bottom: 12px; line-height: 1.35; }
-  h4 { font-size: 1.05rem; font-weight: 700; color: #3a3a5a; margin-top: 28px; margin-bottom: 10px; line-height: 1.35; }
-  h5 { font-size: 0.95rem; font-weight: 700; color: #4a4a6a; margin-top: 24px; margin-bottom: 8px; line-height: 1.35; }
   p { margin-bottom: 18px; }
   strong { font-weight: 700; }
   em { font-style: italic; }
@@ -59,8 +57,7 @@
   td { padding: 10px 16px; border-bottom: 1px solid #e5e8f0; vertical-align: top; }
   code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.88em; background: #eef0f5; padding: 2px 5px; border-radius: 3px; }
   .footer-links { margin-top: 48px; padding-top: 24px; border-top: 1px solid #ddd; font-size: 14px; color: #555; }
-  .appendix-section { margin-top: 24px; padding-top: 12px; }
-  .appendix-section h2 { color: #1a1a2e; }
+  .footer-links a { margin: 0 4px; }
   #totop { position: fixed; bottom: 28px; right: 28px; background: #2563eb; color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; opacity: 0; transition: opacity 0.25s; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 200; }
   #totop.visible { opacity: 1; }
   #totop:hover { background: #1d4ed8; }
@@ -73,7 +70,7 @@
     table { page-break-inside: avoid; }
     thead { background: #ddd !important; color: #000 !important; }
   }
-  @media (max-width: 960px) {
+  @media (max-width: 900px) {
     #sidebar { display: none; }
     main { margin-left: 0; padding: 32px 24px 60px 24px; }
   }
@@ -82,28 +79,25 @@
 <body>
 <aside id="sidebar">
   <div class="sidebar-title">Contents</div>
-  <nav id="toc">
-    <div id="main-toc"></div>
-    <div id="appendix-toc"></div>
-  </nav>
+  <nav id="toc"></nav>
 </aside>
 <main>
   <div class="content" id="content-root">
-    <h1><span style="color:#b45309; font-size:0.6em; font-weight:700; letter-spacing:0.05em; display:block; margin-bottom:4px;">DRAFT IN PROGRESS</span>Everyone Is Confident. Nobody Can Explain How.</h1>
-    <p class="subtitle">Why the AI timeline consensus is too narrow, not necessarily too early.</p>
-    <hr>
+<h1>DRAFT IN PROGRESS — Everyone Is Confident. Nobody Can Explain How.</h1>
+<p class="subtitle">Why the AI timeline consensus is too narrow, not necessarily too early.</p>
+<hr>
 <h2 id="the-puzzle">The Puzzle</h2>
-<p>The AI forecasting community has converged, remarkably, on a narrow window. Metaculus puts the median for AGI at <a href="https://metaculus.com">October 2032</a>. Prediction markets cluster around 2030-2033. The <a href="https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and">AI Safety Leaders Survey</a> (February 2026) gives a median of 2033 with IQR 2031-2036. Even Yoshua Bengio, previously cautious, now warns of <a href="https://www.nature.com/articles/d41586-025-00067-4">&ldquo;existential risk within a decade&rdquo;</a>. The aggressive forecasters — Aschenbrenner, Kokotajlo — say 2027-2030. The skeptics — LeCun, Marcus — argue current approaches won&rsquo;t get there without fundamental breakthroughs, though neither commits to a specific year. (Even Chollet, who argues the current paradigm is &ldquo;fatally flawed,&rdquo; now estimates <a href="https://officechai.com/ai/agi-likely-by-early-2030s-when-arc-agi-6-or-7-will-be-released-arc-prizes-francois-chollet/">AGI by ~2030</a> via a different mechanism.) The spread is maybe 8 years. For a question this hard, that&rsquo;s striking agreement.</p>
-<p>Or is it? The <a href="https://arxiv.org/abs/2401.02843">largest survey of actual ML researchers</a> (Grace et al., 2,778 respondents from NeurIPS/ICML/ICLR/AAAI/JMLR/IJCAI, published January 2024) tells a different story. Asked when machines can &ldquo;accomplish every task better and more cheaply than human workers,&rdquo; the median response was <strong>2047</strong> — fifteen years later than Metaculus. Asked about &ldquo;full automation of labor,&rdquo; it was <strong>2116</strong>. That 69-year gap between two questions that should have roughly the same answer is itself revealing: even individual researchers&rsquo; estimates are <a href="https://aiimpacts.org/how-should-we-analyse-survey-forecasts-of-ai-timelines/">highly sensitive to question framing</a>. Within the survey, the same underlying beliefs produce median estimates that differ by a factor of two depending on whether you ask &ldquo;how many years until X% probability?&rdquo; versus &ldquo;what probability in X years?&rdquo; The apparent consensus in the forecasting community may partly reflect a shared framing rather than shared evidence.</p>
+<p>The AI forecasting community has converged, remarkably, on a narrow window. Metaculus puts the median for AGI at <a href="https://metaculus.com">October 2032</a>. Prediction markets cluster around 2030-2033. The <a href="https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and">AI Safety Leaders Survey</a> (February 2026) gives a median of 2033 with IQR 2031-2036. Even Yoshua Bengio, previously cautious, now warns of <a href="https://www.nature.com/articles/d41586-025-03686-1">&ldquo;existential risk within a decade&rdquo;</a>. The aggressive forecasters — Aschenbrenner, Kokotajlo — say 2027-2030. The skeptics — LeCun, Marcus — argue current approaches won&rsquo;t get there without fundamental breakthroughs, though neither commits to a specific year. (Even Chollet, who argues the current paradigm is &ldquo;fatally flawed,&rdquo; now estimates <a href="https://officechai.com/ai/agi-likely-by-early-2030s-when-arc-agi-6-or-7-will-be-released-arc-prizes-francois-chollet/">AGI by ~2030</a> via a different mechanism.) The spread is maybe 8 years. For a question this hard, that&rsquo;s striking agreement.</p>
+<p>Or is it? The <a href="https://arxiv.org/abs/2401.02843">largest survey of actual ML researchers</a> (Grace et al., 2,778 respondents from NeurIPS/ICML/ICLR/AAAI/JMLR/IJCAI, surveyed late 2023) tells a different story — though with caveats: the data predates the most recent capability jumps, and the respondents are less involved in the forecasting community than Metaculus users or AI safety researchers. Asked when machines can &ldquo;accomplish every task better and more cheaply than human workers,&rdquo; the median response was <strong>2047</strong> — fifteen years later than Metaculus. Asked about &ldquo;full automation of labor,&rdquo; it was <strong>2116</strong>. That 69-year gap between two questions that should have roughly the same answer is itself revealing: even individual researchers&rsquo; estimates are <a href="https://aiimpacts.org/how-should-we-analyse-survey-forecasts-of-ai-timelines/">highly sensitive to question framing</a>. Within the survey, the same underlying beliefs produce median estimates that differ by a factor of two depending on whether you ask &ldquo;how many years until X% probability?&rdquo; versus &ldquo;what probability in X years?&rdquo; The apparent consensus in the forecasting community may partly reflect a shared framing rather than shared evidence.</p>
 <p>But ask a different question — <em>how do we get there?</em> — and whatever consensus exists evaporates entirely. Not because people disagree about the mechanism, but because <strong>nobody has one</strong>.</p>
 <p>We went looking for detailed, mechanistic arguments that explain <em>specifically</em> how the remaining capability gaps close — not trend extrapolation, not &ldquo;scaling continues and capabilities emerge,&rdquo; but an actual engineering-level account of how AI goes from &ldquo;brilliant at tests, unreliable at work&rdquo; to &ldquo;reliably replaces a knowledge worker across unstructured tasks&rdquo; — what we&rsquo;ll call Broad Cognitive Parity (BCP). Here&rsquo;s what we found:</p>
 <p><strong>Leopold Aschenbrenner</strong> (<a href="https://situational-awareness.ai/">Situational Awareness</a>): Names three drivers — compute, algorithms, &ldquo;unhobbling&rdquo; — and counts OOMs. Never explains how any of them close the reliability gap, the open-ended reasoning gap, or the sustained autonomy gap. It&rsquo;s trend extrapolation organized into categories.</p>
-<p><strong>Kokotajlo et al.</strong> (<a href="https://ai-2027.com/">AI 2027</a>): A fictional scenario with named agent generations (Agent-0 through Agent-5), each more capable than the last. Gary Marcus&rsquo;s <a href="https://garymarcus.substack.com/p/the-ai-2027-scenario-how-realistic">critique</a> is sharp: the progression is <em>asserted</em>, not explained. Key breakthroughs are invented (&ldquo;neuralese recurrence&rdquo;). The scenario reads as plausible fiction, not engineering roadmap. The authors recently <a href="https://www.astralcodexten.com/p/my-takeaways-from-ai-2027">pushed their timeline</a> to ~2034 for superintelligence.</p>
+<p><strong>Kokotajlo et al.</strong> (<a href="https://ai-2027.com/">AI 2027</a>): A fictional scenario with named agent generations (Agent-0 through Agent-5), each more capable than the last. Gary Marcus&rsquo;s <a href="https://garymarcus.substack.com/p/the-ai-2027-scenario-how-realistic">critique</a> is sharp: the progression is <em>asserted</em>, not explained. Key breakthroughs are invented (&ldquo;neuralese recurrence&rdquo;). The scenario reads as plausible fiction, not engineering roadmap. The authors recently <a href="https://blog.aifutures.org/p/clarifying-how-our-ai-timelines-forecasts">pushed their timeline</a> to ~2035 for superintelligence.</p>
 <p><strong>Tom Davidson</strong> (<a href="https://epoch.ai/blog/a-compute-based-framework-for-thinking-about-the-future-of-ai/">Epoch AI</a>): A rigorous economic model that explicitly <em>doesn&rsquo;t</em> model how capabilities improve — just when compute is sufficient, assuming scaling laws hold. Davidson is honest about this: the framework predicts <em>when</em> based on extrapolation, not <em>how</em> based on mechanism.</p>
 <p><strong>Dario Amodei</strong> (<a href="https://www.darioamodei.com/essay/machines-of-loving-grace">&ldquo;Machines of Loving Grace&rdquo;</a>): Describes what happens <em>after</em> AGI. Says nothing about how we get there. Zero mechanistic content on the path.</p>
 <p><strong>80,000 Hours</strong> (<a href="https://80000hours.org/ai/guide/when-will-agi-arrive/">guide</a>): The closest thing to a mechanistic argument we found. Identifies four drivers (scaling, RL reasoning, test-time compute, agent scaffolding) and makes a quantitative point: going from 90% to 99% per-step reliability transforms 20-step task success from 10% to 80%. This is genuinely useful. But it still doesn&rsquo;t explain <em>why</em> RL will continue producing gains or how scaffolding handles the open-ended reasoning gap.</p>
 <p>The pattern: <strong>everyone is extrapolating a trend. Nobody is describing a mechanism.</strong> The most prominent AI timeline estimates in the world are, at their core, saying: &ldquo;this exponential curve has held for N years, so it will probably hold for M more years, and when it does, AGI arrives.&rdquo; That&rsquo;s the entire argument.</p>
-<p>I wanted to see what would happen if I pushed an AI to actually build the missing argument — to find object-level mechanistic paths rather than extrapolate trends. This post is largely generated by Claude (Opus) with my editorial oversight. I steered it toward looking for concrete engineering-level arguments, and I took measures to reduce hallucination (adversarial cross-checking, source verification, multiple independent passes). What follows is mostly what Claude produced. I&rsquo;m reporting on what an AI says about the situation, which is interesting in its own right — though I make no claim that it&rsquo;s correct.</p>
+<p>I wanted to see what would happen if I pushed an AI to actually build the missing argument — to find object-level mechanistic paths rather than extrapolate trends. This post is largely generated by Claude (Opus) with my editorial oversight. I steered it toward looking for concrete engineering-level arguments, and I took measures to reduce hallucination (adversarial cross-checking, source verification, multiple independent passes). What follows is mostly what Claude produced. I&rsquo;m reporting on what an AI says about the situation, which I think is interesting in its own right — the structural insights seem sound even if the specific numbers are uncertain.</p>
 <p>The analysis produced a BCP median of ~2034 with wide uncertainty (10th percentile 2029, 90th percentile 2046). For comparison, Metaculus gives a 90th percentile of <a href="https://metaculus.com">2057</a> — the AI&rsquo;s estimate is actually <em>more</em> aggressive than the forecasting community on the right tail.</p>
 <p>But the most interesting output wasn&rsquo;t the numbers. It was a structural observation: the available mechanisms explain why bounded tasks and short-horizon workflows improve. They do not yet explain why those gains should compose into reliable, open-ended, cross-domain autonomy. The argument is that the consensus is too <em>narrow</em>, not necessarily too <em>early</em> — and that the gap between what we can explain and what we&rsquo;re predicting should widen our uncertainty in both directions.</p>
 <hr>
@@ -156,7 +150,7 @@
 <p>The critical question for AI: <strong>which pattern do the remaining gaps follow?</strong></p>
 <hr>
 <h2 id="methodology">Methodology</h2>
-<p>The adversarial structure: a <a href="full.html#appendix-pessimist_argument">pessimist</a> argued for BCP 2040-2060+, an <a href="full.html#appendix-optimist_argument">optimist</a> argued for 2028-2033, neither could see the other&rsquo;s argument, and two isolated <a href="full.html#appendix-reconciliation_pessimist">reconciliation</a> <a href="full.html#appendix-reconciliation_optimist">agents</a> each saw only one side. <a href="full.html#appendix-final_integration">Final integration</a> adjudicated disagreements. Full transcripts are in the appendices.</p>
+<p>The adversarial structure: a <a href="analysis/pessimist_argument.md">pessimist</a> argued for BCP 2040-2060+, an <a href="analysis/optimist_argument.md">optimist</a> argued for 2028-2033, neither could see the other&rsquo;s argument, and two isolated <a href="analysis/reconciliation_pessimist.md">reconciliation</a> <a href="analysis/reconciliation_optimist.md">agents</a> each saw only one side. <a href="analysis/final_integration.md">Final integration</a> adjudicated disagreements. Full arguments are in the appendices.</p>
 <hr>
 <h2 id="the-strongest-case-for-short-timelines">The Strongest Case for Short Timelines</h2>
 <p>Before examining the gaps, it&rsquo;s worth stating the strongest version of the optimist position — which is not merely &ldquo;the curve continues.&rdquo;</p>
@@ -165,7 +159,7 @@
 <p>But it has a specific limitation: <strong>industrialized search works where feedback is dense, cheap, and valid.</strong> Coding has compilers, tests, and fast iteration. Math has proofs. These are where AI progress has been fastest — not by coincidence. The remaining BCP gaps live where feedback becomes sparse, delayed, ambiguous, or dependent on judgment that humans themselves can&rsquo;t easily formalize. The core question for each gap below is not &ldquo;can models reason?&rdquo; but <strong>&ldquo;is the feedback loop good enough for industrialized search to keep working?&rdquo;</strong> Where the answer is yes, progress should look like Moore&rsquo;s Law. Where it&rsquo;s unclear, it may look like fusion.</p>
 <hr>
 <h2 id="the-five-gaps">The Five Gaps</h2>
-<p>We think the absence of a mechanistic argument is itself evidence — mostly for wider uncertainty. If you can&rsquo;t describe how something happens, your confidence that it happens on schedule should be lower. Here&rsquo;s our attempt to construct the argument, with explicit labels on what&rsquo;s grounded, what&rsquo;s plausible, and what&rsquo;s speculative.</p>
+<p>The absence of a mechanistic argument is itself evidence — mostly for wider uncertainty. If you can&rsquo;t describe how something happens, your confidence that it happens on schedule should be lower. Here&rsquo;s our attempt to construct the argument, with explicit labels on what&rsquo;s grounded, what&rsquo;s plausible, and what&rsquo;s speculative.</p>
 <p>The starting point is the key empirical pattern:</p>
 <table>
 <thead>
@@ -200,7 +194,7 @@
 </table>
 <p>AI excels at bounded tasks and struggles at open-ended ones. There are five gaps between current AI and broad cognitive parity. Each needs to close.</p>
 <h3 id="gap-1-reliability-the-error-compounding-wall">Gap 1: Reliability (the error compounding wall)</h3>
-<p><em>Current state</em>: 85-95% per-step accuracy. A 10-step workflow succeeds 20-60% of the time. METR 80% time horizon has grown from ~3 minutes (2023) to ~3 hours (mid-2026), doubling roughly every 3-4 months — but still far from multi-day autonomy.</p>
+<p><em>Current state</em>: 85-95% per-step accuracy. A 10-step workflow succeeds 20-60% of the time. METR 80% time horizon has grown from ~1 minute (2023) to ~3 hours (mid-2026), doubling roughly every 4 months — but still far from multi-day autonomy.</p>
 <p><em>The key insight</em>: You don&rsquo;t need 99.9% per-step accuracy if you have verification and retry. The error compounding math assumes single-pass forward execution, but real deployment uses multi-pass architectures:</p>
 <ul>
 <li><strong>Verification + retry</strong>: If a system verifies each step with 90% accuracy and retries on detected failure, effective per-step accuracy jumps from 85% to ~97%. Two retry cycles reach ~99.5%.</li>
@@ -215,14 +209,14 @@
 <p><em>Current state</em>: 0.37% on ARC-AGI-3 (interactive, no stated goals, requires exploration). 100% for humans.</p>
 <p><em>This is the hardest gap to construct a mechanism for.</em> Three candidate paths:</p>
 <ul>
-<li><strong>Test-time compute + search</strong>: Specialized systems reached ~98% on ARC-AGI-2 via program synthesis and search (though frontier LLMs scored ~24%, with contamination concerns). But ARC-AGI-3 adds interactivity, which breaks pure search — you can&rsquo;t enumerate possibilities in an environment you have to explore.</li>
+<li><strong>Test-time compute + search</strong>: ARC-AGI-1 was effectively solved (~98%) via a combination of program synthesis and frontier LLMs — but ARC-AGI-2 proved much harder, with the best score at ~24% and contamination concerns. ARC-AGI-3 adds interactivity, which breaks pure search — you can&rsquo;t enumerate possibilities in an environment you have to explore.</li>
 <li><strong>RL in interactive environments</strong>: Training agents through reinforcement learning in games, simulations, and sandboxed environments. Active research direction, not done at frontier scale.</li>
 <li><strong>Emergent capability from scale</strong>: Sufficiently large models might develop interactive reasoning as an emergent capability. Unfalsifiable until it happens or doesn&rsquo;t.</li>
 </ul>
-<p>The Erdos disproof and DeepMind&rsquo;s <a href="https://www.marktechpost.com/2026/03/13/google-deepmind-introduces-aletheia-the-ai-agent-moving-from-math-competitions-to-fully-autonomous-professional-research-discoveries/">Aletheia</a> (63 solutions across 700 open math problems) show genuine autonomous reasoning — but in formal mathematics, the most AI-friendly domain. Whether it transfers to messier domains is exactly the question.</p>
+<p>The Erdos disproof and DeepMind&rsquo;s <a href="https://www.marktechpost.com/2026/03/13/google-deepmind-introduces-aletheia-the-ai-agent-moving-from-math-competitions-to-fully-autonomous-professional-research-discoveries/">Aletheia</a> (63 mathematically valid solutions across 700 open problems, though only 13 addressed the intended problem statement — the rest reinterpreted questions in ways that made answers trivial) show genuine autonomous reasoning — but in formal mathematics, the most AI-friendly domain. Whether it transfers to messier domains is exactly the question.</p>
 <p><em>Assessment</em>: <strong>Speculative.</strong> We can name research directions but can&rsquo;t point to a specific mechanism that clearly closes this gap. The fundamental challenge through the feedback lens: there&rsquo;s no compiler for novel reasoning. Training requires environments where good reasoning can be distinguished from bad — and for genuinely novel, interactive problems, constructing such environments is itself a research problem. If interactive reasoning proves architectural (requiring world models or learned causal reasoning), timelines extend 5-10 years. <strong>Of the five gaps, this is where &ldquo;we don&rsquo;t know how&rdquo; is the most honest answer.</strong></p>
 <h3 id="gap-3-sustained-autonomy">Gap 3: Sustained autonomy</h3>
-<p><em>Current state</em>: The METR 80% time horizon is ~3 hours (mid-2026), up from ~3 minutes in 2023. But agents still show goal drift, context saturation, and compounding errors on longer tasks (<a href="https://www.chanl.ai/blog/agent-drift-silent-degradation">chanl.ai</a>).</p>
+<p><em>Current state</em>: The METR 80% time horizon is ~3 hours (mid-2026), up from ~1 minute in 2023. But agents still show goal drift, context saturation, and compounding errors on longer tasks (<a href="https://www.chanl.ai/blog/agent-drift-silent-degradation">chanl.ai</a>).</p>
 <p><em>Likely mechanisms</em>:</p>
 <ul>
 <li><strong>Hierarchical context management</strong>: Short-term working memory, medium-term task state, long-term reference store — mimicking how humans manage extended work (we don&rsquo;t hold 8 hours of raw experience in working memory).</li>
@@ -293,23 +287,46 @@
 <h2 id="so-which-historical-pattern-does-ai-follow">So Which Historical Pattern Does AI Follow?</h2>
 <p>This is the crux. The answer is: <strong>different gaps follow different patterns.</strong></p>
 <p><strong>The reliability gap is somewhere in between.</strong> Engineering solutions (verification, retry, decomposition) are grounded and will deliver meaningful gains — more like Moore&rsquo;s Law. But closing the last mile of reliability (from 99% to 99.9%+ per-step) may require model-level improvements that we can&rsquo;t describe mechanistically.</p>
-<p><strong>Open-ended reasoning might follow the fusion pattern.</strong> The ARC-AGI-3 gap (0.37% vs. 100%) is qualitatively different from benchmark performance — it requires interactive exploration, implicit goal inference, and real-time adaptation. If this is a qualitative barrier rather than a quantitative scaling problem, trend extrapolation is unreliable and timelines could be much longer. Specialized systems reached ~98% on ARC-AGI-2 via program synthesis, but frontier LLMs scored only ~24% (with contamination concerns), and ARC-AGI-3&rsquo;s addition of interactivity may represent the qualitative barrier.</p>
+<p><strong>Open-ended reasoning might follow the fusion pattern.</strong> The ARC-AGI-3 gap (0.37% vs. 100%) is qualitatively different from benchmark performance — it requires interactive exploration, implicit goal inference, and real-time adaptation. If this is a qualitative barrier rather than a quantitative scaling problem, trend extrapolation is unreliable and timelines could be much longer. ARC-AGI-1 was solved (~98%) but ARC-AGI-2&rsquo;s best score was only ~24% (with contamination concerns), and ARC-AGI-3&rsquo;s addition of interactivity may represent a qualitative barrier.</p>
 <p><strong>Sustained autonomy and metacognition</strong> are primarily constrained by reliability and open-ended reasoning — their trajectories depend on those gaps rather than following an independent pattern.</p>
 <p><strong>Cross-domain generalization follows the solar panel pattern</strong> — driven by economic pull and cross-domain innovation, with the specific path inherently unpredictable. This is the most optimistic analogy for the five gaps, suggesting generalization will happen but through mechanisms we can&rsquo;t currently foresee.</p>
 <p>The implication: <strong>our confidence in BCP should be lower than most forecasters assume</strong>, because the BCP-critical gaps include at least one (open-ended reasoning) that may follow the &ldquo;hard problem&rdquo; rather than &ldquo;broad frontier&rdquo; pattern. The bounded-task progress that drives most forecasters&rsquo; confidence follows the Moore&rsquo;s Law pattern — broad frontier, many R&amp;D paths, strong economic pull. But that progress isn&rsquo;t the bottleneck for BCP.</p>
 <hr>
 <h2 id="the-string-theory-precedent">The String Theory Precedent</h2>
-<p>The analysis above suggests that the evidence for short BCP timelines is weaker than it appears — the hardest gaps lack mechanistic paths. But a natural objection: the smartest people in AI converge on short timelines. Doesn&rsquo;t that convergence itself constitute evidence?</p>
-<p>The scope of this analogy is narrow but precise. Unlike string theory, AI is an empirical field with empirical results — models scoring 100% on AIME and 94% on GPQA Diamond are real, measured, replicated achievements. Nobody disputes that current AI methods work. The question is whether they will resolve the central open problem: closing the gap from bounded-task excellence to broad cognitive parity. That is structurally the same question the naturalness program in physics faced — and convergent expert confidence turned out to be a poor guide.</p>
-<p>For 30+ years, the &ldquo;naturalness&rdquo; program predicted that supersymmetric particles must exist near the electroweak scale (~1 TeV). Edward Witten — widely considered the greatest living theoretical physicist — said <a href="https://www.pbs.org/wgbh/nova/article/conversation-with-edward-witten/">&ldquo;many physicists do suspect that our present decade is the decade when supersymmetry will be discovered.&rdquo;</a> Maria Spiropulu (Caltech experimentalist, 2016): <a href="https://www.quantamagazine.org/what-no-new-particles-means-for-physics-20160815/">&ldquo;If you ask people of my generation, we were almost taught that supersymmetry is there even if we haven&rsquo;t discovered it.&rdquo;</a> The LHC found the Higgs boson in 2012 — and nothing else. Arkani-Hamed, the leading theorist of the program, acknowledged: <a href="https://www.quantamagazine.org/what-no-new-particles-means-for-physics-20160815/"><em>&ldquo;It&rsquo;s striking that we&rsquo;ve thought about these things for 30 years and we have not made one correct prediction that they have seen.&rdquo;</em></a></p>
-<p>The mechanisms of failure are instructive: mathematical elegance treated as empirical confirmation (Witten: <em>&ldquo;too many nice things have happened in string theory for it to be all wrong&rdquo;</em>); an unfalsifiable core with falsifiable periphery (when SUSY failed, theorists retreated to &ldquo;string theory doesn&rsquo;t actually predict low-energy SUSY&rdquo;); goalpost shifting (predicted mass scales rose with each null result); and institutional lock-in (hiring, grants, and prestige concentrated in the paradigm).
-| String Theory | AI Timelines |
-|--------------|-------------|
-| Scaling laws elegant and predictive in-sample | Scaling laws elegant and predictive in-sample |
-| Unfalsifiable core with falsifiable periphery | Unfalsifiable core (&ldquo;scaling leads to AGI&rdquo;) with falsifiable periphery |
-| Goalpost shifting when predictions fail | Potential for goalpost shifting when benchmarks plateau |
-| Convergent confidence among brilliant people | Convergent confidence among brilliant people |
-| Institutional incentives aligned with paradigm | Financial incentives aligned with short timelines |</p>
+<p>The analysis above suggests that the evidence for confident BCP timelines is weaker than it appears — the hardest gaps lack mechanistic paths. But a natural objection: many of the smartest people in AI expect short timelines. Doesn&rsquo;t that constitute evidence? (The Grace survey complicates this — ML researchers as a whole give much longer estimates. But the forecasting community, lab leaders, and prediction markets do cluster on 2030-2035, and that&rsquo;s the consensus most people encounter.)</p>
+<p>An important caveat on scope: unlike string theory, AI is an empirical field with empirical results — models scoring 100% on AIME and 94% on GPQA Diamond are real, measured, replicated achievements. Nobody disputes that current AI methods work. The question is whether they will resolve the central open problem: closing the gap from bounded-task excellence to broad cognitive parity. That is structurally the same question the naturalness program in physics faced — and convergent expert confidence turned out to be a poor guide.</p>
+<p>For 30+ years, the &ldquo;naturalness&rdquo; program predicted that supersymmetric particles must exist near the electroweak scale (~1 TeV). Edward Witten — widely considered the greatest living theoretical physicist — said <a href="https://www.pbs.org/wgbh/nova/elegant/view-witten.html">&ldquo;many physicists do suspect that our present decade is the decade when supersymmetry will be discovered.&rdquo;</a> Maria Spiropulu (Caltech experimentalist, 2016): <a href="https://www.quantamagazine.org/what-no-new-particles-means-for-physics-20160809/">&ldquo;If you ask people of my generation, we were almost taught that supersymmetry is there even if we haven&rsquo;t discovered it.&rdquo;</a> The LHC found the Higgs boson in 2012 — and nothing else. Arkani-Hamed, the leading theorist of the program, acknowledged: <a href="https://www.quantamagazine.org/what-no-new-particles-means-for-physics-20160809/"><em>&ldquo;It&rsquo;s striking that we&rsquo;ve thought about these things for 30 years and we have not made one correct prediction that they have seen.&rdquo;</em></a></p>
+<p>The mechanisms of failure are instructive: mathematical elegance treated as empirical confirmation (Witten: <em>&ldquo;too many nice things have happened in string theory for it to be all wrong&rdquo;</em>); an unfalsifiable core with falsifiable periphery (when SUSY failed, theorists retreated to &ldquo;string theory doesn&rsquo;t actually predict low-energy SUSY&rdquo;); goalpost shifting (predicted mass scales rose with each null result); and institutional lock-in (hiring, grants, and prestige concentrated in the paradigm).</p>
+<table>
+<thead>
+<tr>
+<th>String Theory</th>
+<th>AI Timelines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scaling laws elegant and predictive in-sample</td>
+<td>Scaling laws elegant and predictive in-sample</td>
+</tr>
+<tr>
+<td>Unfalsifiable core with falsifiable periphery</td>
+<td>Unfalsifiable core (&ldquo;scaling leads to AGI&rdquo;) with falsifiable periphery</td>
+</tr>
+<tr>
+<td>Goalpost shifting when predictions fail</td>
+<td>Potential for goalpost shifting when benchmarks plateau</td>
+</tr>
+<tr>
+<td>Convergent confidence among brilliant people</td>
+<td>Convergent confidence among brilliant people</td>
+</tr>
+<tr>
+<td>Institutional incentives aligned with paradigm</td>
+<td>Financial incentives aligned with short timelines</td>
+</tr>
+</tbody>
+</table>
 <p>And there&rsquo;s an even more direct precedent: <strong>the founders of AI themselves.</strong> Herbert Simon predicted in 1965 that <em>&ldquo;machines will be capable, within twenty years, of doing any work a man can do.&rdquo;</em> Marvin Minsky predicted in 1970 that a machine with <em>&ldquo;the general intelligence of an average human being&rdquo;</em> could be built within 3-8 years. They were wrong for 60+ years. The current generation says &ldquo;but we have fundamentally better tools&rdquo; — which is exactly what each previous generation said about <em>their</em> tools.</p>
 <p>None of this proves current AI timeline estimates are wrong. It shows that <strong>convergent confidence among brilliant people, in the absence of a mechanistic path to the goal, is not reliable evidence by itself.</strong> The question is not &ldquo;do smart people agree?&rdquo; but &ldquo;can anyone describe the specific mechanism by which the remaining gaps close?&rdquo;</p>
 <hr>
@@ -317,7 +334,7 @@
 <p>The question that matters is: <strong>when does AI achieve BCP</strong> — not just ace tests, but actually do the job? AI is already superhuman on most bounded cognitive tasks (math competitions, science knowledge, coding benchmarks), but the bounded/open-ended pattern means test performance doesn&rsquo;t predict job performance.</p>
 <h3 id="the-binary-structure">The binary structure</h3>
 <p>Before giving numbers, we want to flag something the analysis revealed that we think is more important than the specific estimates.</p>
-<p>The epistemic situation is more binary than a smooth probability distribution suggests. Either the current paradigm (transformer scaling + RL + scaffolding) is sufficient for BCP — in which case the debate is about <em>when</em> between ~2029-2038 — or it isn&rsquo;t, in which case we need a fundamentally new approach, and <strong>we have almost no basis for estimating how long that takes.</strong></p>
+<p>The epistemic situation is more binary than a smooth probability distribution suggests. Either the current paradigm (transformer scaling + RL + scaffolding) is sufficient for BCP — in which case the debate is about <em>when</em> between ~2029-2038 — or it isn&rsquo;t, in which case we need a fundamentally new approach, and <strong>we have almost no basis for estimating how long that takes.</strong> (In practice, the outcome is likely partial: the current paradigm may close some gaps — reliability, metacognition — while requiring something new for others — open-ended reasoning. But the binary framing captures the key uncertainty.)</p>
 <p>The Simon and Minsky predictions discussed above illustrate this concretely. They weren&rsquo;t wrong about the <em>timeline within their paradigm</em> — symbolic AI really did hit a wall roughly when critics expected. They were wrong about how long it would take to find the <em>next</em> paradigm. It wasn&rsquo;t &ldquo;add 10 years&rdquo; — it was multiple decades and multiple paradigm shifts (expert systems, neural networks, deep learning, transformers) before the field reached its current capabilities. The within-paradigm error was 5-10 years. The cross-paradigm error was 50+.</p>
 <p>One important disanalogy: a researcher in 2032 hitting a wall with transformers will have AI tools that Minsky never had. The most plausible route to short timelines may not be direct BCP across all domains — it&rsquo;s AI becoming good enough at AI research to find the next paradigm faster than humans alone. AI R&amp;D has unusually good feedback loops: benchmarks, training curves, ablations, code. But even here, the argument is partially circular: the kind of research needed to solve open-ended reasoning — where the feedback is &ldquo;did this architectural change produce genuine understanding or just better pattern matching?&rdquo; — is itself a sparse-feedback problem. AI-accelerated research works today for optimization <em>within</em> the current paradigm. Whether it works for finding the <em>next</em> paradigm is precisely the question at issue.</p>
 <p>This means any BCP estimate is really two estimates stapled together: a within-paradigm estimate (which can be reasoned about mechanistically) and a cross-paradigm estimate (which is largely a guess). Most forecasters are implicitly betting on the within-paradigm scenario. The question is how much weight the cross-paradigm scenario deserves.</p>
@@ -352,24 +369,24 @@
 </tr>
 </tbody>
 </table>
-<p>At these numbers: ~15% probability of BCP by 2030. ~48% by 2035. ~75% by 2040.</p>
-<p><strong>Wide uncertainty is the honest answer.</strong> The mechanistic argument is grounded through ~2030 (engineering + scaling) and speculative after that. We assign ~24% probability to a scenario where current architectures prove insufficient and a fundamentally new approach is needed (BCP ~2038-2045). But given the binary structure above, this range is anchored by proximity to the median rather than any independent reasoning about how long paradigm shifts take. The 90th percentile could reasonably be in the 2050s, and the analysis&rsquo;s own central claim — that nobody can describe the mechanism for closing the hardest gaps — cuts against confident upper bounds as much as it cuts against confident lower bounds.</p>
+<p>At these numbers: ~15% probability of BCP by 2030. ~55% by 2035. ~75% by 2040.</p>
+<p><strong>Wide uncertainty is the honest answer.</strong> The mechanistic argument is grounded through ~2030 (engineering + scaling) and speculative after that. We assign ~25% probability to a scenario where current architectures prove insufficient and a fundamentally new approach is needed (BCP after ~2040). But given the binary structure above, this range is anchored by proximity to the median rather than any independent reasoning about how long paradigm shifts take. The 90th percentile could reasonably be in the 2050s, and the analysis&rsquo;s own central claim — that nobody can describe the mechanism for closing the hardest gaps — cuts against confident upper bounds as much as it cuts against confident lower bounds.</p>
 <hr>
 <h2 id="conflicts-of-interest-applied-symmetrically">Conflicts of Interest — Applied Symmetrically</h2>
 <p>Nearly every prominent forecaster has financial stakes:</p>
 <p><strong>Incentivized toward shorter timelines</strong>: Lab CEOs (Amodei, Altman, Hassabis) — valuations and fundraising. AI investors (Aschenbrenner&rsquo;s $5.5B fund, Schmidt) — portfolio returns. Hardware vendors (Huang) — market cap.</p>
-<p><strong>Incentivized toward longer timelines</strong>: Academic researchers (76% of a <a href="https://www.scientificamerican.com/article/ai-survey-exaggerates-apocalyptic-risks/">2025 AAAI survey</a> said scaling current approaches is unlikely to produce general intelligence) — funding depends on &ldquo;new paradigm needed.&rdquo; Alternative-architecture founders (LeCun/AMI Labs with <a href="https://tech-insider.org/yann-lecun-ami-labs-1-billion-world-models-2026/">$1.03B</a>, Sutskever/SSI valued at $32B) — company valuations depend on current approaches being insufficient. ARC Prize creator (Chollet) — benchmark relevance depends on current architectures not solving it via scaling alone.</p>
+<p><strong>Incentivized toward longer timelines</strong>: Academic researchers (76% of a <a href="https://aaai.org/wp-content/uploads/2025/03/AAAI-2025-PresPanel-Report-FINAL.pdf">2025 AAAI survey</a> said scaling current approaches is unlikely to produce general intelligence) — funding depends on &ldquo;new paradigm needed.&rdquo; Alternative-architecture founders (LeCun/AMI Labs with <a href="https://tech-insider.org/yann-lecun-ami-labs-1-billion-world-models-2026/">$1.03B</a>, Sutskever/SSI valued at $32B) — company valuations depend on current approaches being insufficient. ARC Prize creator (Chollet) — benchmark relevance depends on current architectures not solving it via scaling alone.</p>
 <p><strong>Least conflicted</strong>: Prediction markets, superforecaster surveys, <a href="https://epoch.ai/">Epoch AI</a> empirical tracking. These cluster around BCP ~2030-2035.</p>
 <p>We applied this analysis symmetrically throughout. When a lab CEO says &ldquo;AGI by 2027,&rdquo; we discount it. When an academic says &ldquo;scaling can&rsquo;t work,&rdquo; we discount that too.</p>
 <hr>
 <h2 id="falsifiable-predictions">Falsifiable Predictions</h2>
 <p>Seven predictions that discriminate between timelines.</p>
 <h3 id="1-metr-80-time-horizon-dec-2027">1. METR 80% Time Horizon (Dec 2027)</h3>
-<p><strong>Threshold</strong>: &gt;24 hours. <strong>Confidence</strong>: 40%. The 80% horizon is ~3 hours as of mid-2026, doubling every 3-4 months. If the doubling rate holds, this threshold is met by extrapolation — but sustained doublings are the question, not the assumption. If the horizon plateaus below ~8 hours, it suggests the reliability gap resists scaling. <em>Source: <a href="https://metr.org/time-horizons/">METR</a></em></p>
+<p><strong>Threshold</strong>: &gt;24 hours. <strong>Confidence</strong>: 45%. The 80% horizon is ~3 hours as of mid-2026, doubling roughly every 4 months. Simple extrapolation of the current rate reaches this threshold — but the 80% horizon measures the <em>easiest</em> tasks at each duration, and each doubling requires handling qualitatively harder failure modes. If the horizon plateaus below ~8 hours, it suggests the reliability gap resists scaling. <em>Source: <a href="https://metr.org/time-horizons/">METR</a></em></p>
 <h3 id="2-arc-agi-3-progress-dec-2027">2. ARC-AGI-3 Progress (Dec 2027)</h3>
 <p><strong>Threshold</strong>: Best model &gt;10%. <strong>Confidence</strong>: 30%. If met: bounded/open-ended boundary is permeable — strongest signal for the Moore&rsquo;s Law pattern over the fusion pattern. <em>Source: <a href="https://arcprize.org/">ARC Prize</a></em></p>
 <h3 id="3-non-mathematical-scientific-discovery-jun-2028">3. Non-Mathematical Scientific Discovery (Jun 2028)</h3>
-<p><strong>Threshold</strong>: AI autonomously produces a verified, published result in biology, chemistry, materials science, or ML. <strong>Confidence</strong>: 35%. If met: Erdos/Aletheia generalizes beyond formal math.</p>
+<p><strong>Threshold</strong>: AI produces a verified, peer-reviewed result in biology, chemistry, or materials science with minimal human guidance (hypothesis generation and experimental design, not just data analysis). <strong>Confidence</strong>: 35%. If met: Erdos/Aletheia generalizes beyond formal math.</p>
 <h3 id="4-enterprise-ai-success-non-coding-mid-2028">4. Enterprise AI Success — Non-Coding (mid-2028)</h3>
 <p><strong>Threshold</strong>: &gt;35% success rate past pilot to production. <strong>Confidence</strong>: 20%. If met: deployment gap narrowing beyond coding. <em>Source: Gartner/McKinsey surveys</em></p>
 <h3 id="5-humanityrsquos-last-exam-saturation-dec-2028">5. Humanity&rsquo;s Last Exam Saturation (Dec 2028)</h3>
@@ -384,70 +401,44 @@
 <h2 id="the-bottom-line">The Bottom Line</h2>
 <p><strong>This analysis is not arguing for complacency.</strong> A ~2034 median with ~15% probability by 2030 is an aggressive forecast by historical standards. The point is not that the consensus is too early — it is that the consensus is too narrow.</p>
 <p><strong>BCP by ~2034 has half a mechanistic argument and half a hope.</strong> The first half — engineering reliability, scaling, industrialized search in feedback-rich domains — is grounded. The second half — open-ended reasoning, cross-domain generalization, sustained autonomy in feedback-sparse domains — requires breakthroughs we can name but can&rsquo;t describe.</p>
-<p><strong>The right tail matters more than you think.</strong> The ~24% probability we assign to BCP after 2040 reflects the possibility that the open-ended reasoning gap follows the fusion pattern rather than Moore&rsquo;s Law. Nobody can currently distinguish between these patterns. ARC-AGI-3 by end of 2027 is the most diagnostic test.</p>
+<p><strong>The right tail matters more than you think.</strong> The ~25% probability we assign to BCP after ~2040 reflects the possibility that the open-ended reasoning gap follows the fusion pattern rather than Moore&rsquo;s Law. Nobody can currently distinguish between these patterns. ARC-AGI-3 by end of 2027 is the most diagnostic test.</p>
 <p><strong>Convergent confidence is not enough.</strong> The AI forecasting consensus shares specific structural features with the naturalness program in physics: in-sample elegance treated as out-of-sample evidence, institutional incentives aligned with the paradigm, and convergent confidence driven by shared priors rather than independent evidence. The question to ask is not &ldquo;do smart people agree?&rdquo; but &ldquo;can anyone describe the specific mechanism?&rdquo; For BCP, the answer is: only partially, and only for the feedback-rich half of the problem.</p>
 <p>The most valuable thing about constructing the mechanistic argument isn&rsquo;t the argument itself — it&rsquo;s what the attempt reveals about where knowledge runs out. For bounded tasks, knowledge runs out around the details. For BCP, it runs out around the fundamentals. That difference should be reflected in our confidence levels, and for most forecasters, it isn&rsquo;t.</p>
 <hr>
-<p><em>Full analysis: <a href="full.html#appendix-synthesis_and_crux_map_v2">synthesis &amp; crux map</a> · <a href="full.html#appendix-pessimist_argument">pessimist argument</a> · <a href="full.html#appendix-optimist_argument">optimist argument</a> · <a href="full.html#appendix-reconciliation_pessimist">pessimist reconciliation</a> · <a href="full.html#appendix-reconciliation_optimist">optimist reconciliation</a> · <a href="full.html#appendix-final_integration">final integration</a></em></p>
-    <hr>
-<h2 id="appendices" style="font-size:1.7rem;">Appendices</h2>
-<p>This analysis is supported by twelve detailed research documents covering the full evidence base and adversarial debate process. They are collected in a <a href="full.html">single-page version with all appendices</a>.</p>
+<h2 id="appendices">Appendices</h2>
+<p>The full supporting analysis is available in the <a href="full.html">complete version with all appendices</a>. It includes:</p>
 <ul>
-<li><strong>Benchmark Survey</strong> — comprehensive survey of AI capability benchmarks as of mid-2026</li>
-<li><strong>Social Cognition &amp; Turing Tests</strong> — AI performance on social reasoning and deception detection</li>
-<li><strong>Novel Reasoning &amp; Soft Skills</strong> — open-ended problem solving, creativity, and tacit knowledge</li>
-<li><strong>Existing Forecasts</strong> — survey of published AGI timeline predictions and their methodologies</li>
-<li><strong>Skeptical Arguments</strong> — strongest cases against short timelines</li>
-<li><strong>Compute Trajectory</strong> — hardware scaling, training costs, and inference economics</li>
-<li><strong>Synthesis &amp; Crux Map</strong> — identifying the key empirical disagreements that drive timeline estimates</li>
-<li><strong>Pessimist Argument</strong> — the case for BCP 2040&ndash;2060+</li>
-<li><strong>Optimist Argument</strong> — the case for BCP 2028&ndash;2033</li>
-<li><strong>Pessimist Reconciliation</strong> — evaluating the pessimist case against the evidence</li>
-<li><strong>Optimist Reconciliation</strong> — evaluating the optimist case against the evidence</li>
-<li><strong>Final Integration</strong> — adjudicating disagreements and producing the final estimate</li>
+<li><strong>Research</strong>: Benchmark survey, social cognition &amp; Turing tests, novel reasoning &amp; soft skills, existing forecasts, skeptical arguments, compute trajectory</li>
+<li><strong>Analysis</strong>: Synthesis &amp; crux map, pessimist argument, optimist argument, pessimist reconciliation, optimist reconciliation, final integration</li>
 </ul>
-</div>
-
   </div>
 </main>
 <button id="totop" aria-label="Back to top">&uarr;</button>
 <script>
 (function(){
-  // Build TOC from main post h2/h3 (stop at appendices)
-  const mainToc = document.getElementById('main-toc');
-  const appendicesEl = document.getElementById('appendices');
+  // Build TOC from h2/h3
+  const toc = document.getElementById('toc');
   const headings = document.querySelectorAll('#content-root h2, #content-root h3');
   headings.forEach((h, i) => {
-    // Skip headings inside appendix sections for main TOC
-    if (appendicesEl && appendicesEl.compareDocumentPosition(h) & Node.DOCUMENT_POSITION_FOLLOWING) {
-      // h is after appendices header - skip unless it IS the appendices header
-      if (h !== appendicesEl) return;
-    }
     if (!h.id) h.id = 'sec-' + i;
     const a = document.createElement('a');
     a.href = '#' + h.id;
     a.textContent = h.textContent;
     a.className = h.tagName === 'H2' ? 'h2-link' : 'h3-link';
-    mainToc.appendChild(a);
+    toc.appendChild(a);
   });
-  // Scroll tracking for all TOC links
-  const allLinks = document.querySelectorAll('#toc a');
-  const allTargets = [];
-  allLinks.forEach(l => {
-    const id = l.getAttribute('href')?.replace('#','');
-    const el = id && document.getElementById(id);
-    if (el) allTargets.push({ link: l, el: el });
-  });
+  // Scroll tracking
+  const links = toc.querySelectorAll('a');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
-        allLinks.forEach(l => l.classList.remove('active'));
-        const match = allTargets.find(t => t.el === e.target);
-        if (match) match.link.classList.add('active');
+        links.forEach(l => l.classList.remove('active'));
+        const active = toc.querySelector('a[href="#' + e.target.id + '"]');
+        if (active) active.classList.add('active');
       }
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
-  allTargets.forEach(t => observer.observe(t.el));
+  headings.forEach(h => observer.observe(h));
   // Scroll-to-top button
   const btn = document.getElementById('totop');
   window.addEventListener('scroll', () => btn.classList.toggle('visible', window.scrollY > 400));
