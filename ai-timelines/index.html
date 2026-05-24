@@ -94,7 +94,8 @@
     <hr>
 <h2 id="the-puzzle">The Puzzle</h2>
 <p>The AI forecasting community has converged, remarkably, on a narrow window. Metaculus puts the median for AGI at <a href="https://metaculus.com">October 2032</a>. Prediction markets cluster around 2030-2033. The <a href="https://forum.effectivealtruism.org/posts/LxuKuQd69Qx5FKhNZ/survey-of-ai-safety-leaders-on-x-risk-agi-timelines-and">AI Safety Leaders Survey</a> (February 2026) gives a median of 2033 with IQR 2031-2036. Even Yoshua Bengio, previously cautious, now warns of <a href="https://www.nature.com/articles/d41586-025-00067-4">&ldquo;existential risk within a decade&rdquo;</a>. The aggressive forecasters — Aschenbrenner, Kokotajlo — say 2027-2030. The skeptics — LeCun, Marcus — argue current approaches won&rsquo;t get there without fundamental breakthroughs, though neither commits to a specific year. (Even Chollet, who argues the current paradigm is &ldquo;fatally flawed,&rdquo; now estimates <a href="https://officechai.com/ai/agi-likely-by-early-2030s-when-arc-agi-6-or-7-will-be-released-arc-prizes-francois-chollet/">AGI by ~2030</a> via a different mechanism.) The spread is maybe 8 years. For a question this hard, that&rsquo;s striking agreement.</p>
-<p>But ask a different question — <em>how do we get there?</em> — and the consensus evaporates. Not because people disagree about the mechanism, but because <strong>nobody has one</strong>.</p>
+<p>Or is it? The <a href="https://arxiv.org/abs/2401.02843">largest survey of actual ML researchers</a> (Grace et al., 2,778 respondents from NeurIPS/ICML/ICLR/AAAI/JMLR/IJCAI, published January 2024) tells a different story. Asked when machines can &ldquo;accomplish every task better and more cheaply than human workers,&rdquo; the median response was <strong>2047</strong> — fifteen years later than Metaculus. Asked about &ldquo;full automation of labor,&rdquo; it was <strong>2116</strong>. That 69-year gap between two questions that should have roughly the same answer is itself revealing: even individual researchers&rsquo; estimates are <a href="https://aiimpacts.org/how-should-we-analyse-survey-forecasts-of-ai-timelines/">highly sensitive to question framing</a>. Within the survey, the same underlying beliefs produce median estimates that differ by a factor of two depending on whether you ask &ldquo;how many years until X% probability?&rdquo; versus &ldquo;what probability in X years?&rdquo; The apparent consensus in the forecasting community may partly reflect a shared framing rather than shared evidence.</p>
+<p>But ask a different question — <em>how do we get there?</em> — and whatever consensus exists evaporates entirely. Not because people disagree about the mechanism, but because <strong>nobody has one</strong>.</p>
 <p>We went looking for detailed, mechanistic arguments that explain <em>specifically</em> how the remaining capability gaps close — not trend extrapolation, not &ldquo;scaling continues and capabilities emerge,&rdquo; but an actual engineering-level account of how AI goes from &ldquo;brilliant at tests, unreliable at work&rdquo; to &ldquo;reliably replaces a knowledge worker across unstructured tasks&rdquo; — what we&rsquo;ll call Broad Cognitive Parity (BCP). Here&rsquo;s what we found:</p>
 <p><strong>Leopold Aschenbrenner</strong> (<a href="https://situational-awareness.ai/">Situational Awareness</a>): Names three drivers — compute, algorithms, &ldquo;unhobbling&rdquo; — and counts OOMs. Never explains how any of them close the reliability gap, the open-ended reasoning gap, or the sustained autonomy gap. It&rsquo;s trend extrapolation organized into categories.</p>
 <p><strong>Kokotajlo et al.</strong> (<a href="https://ai-2027.com/">AI 2027</a>): A fictional scenario with named agent generations (Agent-0 through Agent-5), each more capable than the last. Gary Marcus&rsquo;s <a href="https://garymarcus.substack.com/p/the-ai-2027-scenario-how-realistic">critique</a> is sharp: the progression is <em>asserted</em>, not explained. Key breakthroughs are invented (&ldquo;neuralese recurrence&rdquo;). The scenario reads as plausible fiction, not engineering roadmap. The authors recently <a href="https://www.astralcodexten.com/p/my-takeaways-from-ai-2027">pushed their timeline</a> to ~2034 for superintelligence.</p>
@@ -301,37 +302,14 @@
 <p>The analysis above suggests that the evidence for short BCP timelines is weaker than it appears — the hardest gaps lack mechanistic paths. But a natural objection: the smartest people in AI converge on short timelines. Doesn&rsquo;t that convergence itself constitute evidence?</p>
 <p>The scope of this analogy is narrow but precise. Unlike string theory, AI is an empirical field with empirical results — models scoring 100% on AIME and 94% on GPQA Diamond are real, measured, replicated achievements. Nobody disputes that current AI methods work. The question is whether they will resolve the central open problem: closing the gap from bounded-task excellence to broad cognitive parity. That is structurally the same question the naturalness program in physics faced — and convergent expert confidence turned out to be a poor guide.</p>
 <p>For 30+ years, the &ldquo;naturalness&rdquo; program predicted that supersymmetric particles must exist near the electroweak scale (~1 TeV). Edward Witten — widely considered the greatest living theoretical physicist — said <a href="https://www.pbs.org/wgbh/nova/article/conversation-with-edward-witten/">&ldquo;many physicists do suspect that our present decade is the decade when supersymmetry will be discovered.&rdquo;</a> Maria Spiropulu (Caltech experimentalist, 2016): <a href="https://www.quantamagazine.org/what-no-new-particles-means-for-physics-20160815/">&ldquo;If you ask people of my generation, we were almost taught that supersymmetry is there even if we haven&rsquo;t discovered it.&rdquo;</a> The LHC found the Higgs boson in 2012 — and nothing else. Arkani-Hamed, the leading theorist of the program, acknowledged: <a href="https://www.quantamagazine.org/what-no-new-particles-means-for-physics-20160815/"><em>&ldquo;It&rsquo;s striking that we&rsquo;ve thought about these things for 30 years and we have not made one correct prediction that they have seen.&rdquo;</em></a></p>
-<p>The mechanisms of failure are instructive: mathematical elegance treated as empirical confirmation (Witten: <em>&ldquo;too many nice things have happened in string theory for it to be all wrong&rdquo;</em>); an unfalsifiable core with falsifiable periphery (when SUSY failed, theorists retreated to &ldquo;string theory doesn&rsquo;t actually predict low-energy SUSY&rdquo;); goalpost shifting (predicted mass scales rose with each null result); and institutional lock-in (hiring, grants, and prestige concentrated in the paradigm). Hossenfelder documented the pattern in <a href="https://www.basicbooks.com/titles/sabine-hossenfelder/lost-in-math/9780465094264/"><em>Lost in Math</em></a>: <em>&ldquo;The belief in beauty has become so dogmatic that it now conflicts with scientific objectivity.&rdquo;</em></p>
-<table>
-<thead>
-<tr>
-<th>String Theory</th>
-<th>AI Timelines</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Scaling laws elegant and predictive in-sample</td>
-<td>Scaling laws elegant and predictive in-sample</td>
-</tr>
-<tr>
-<td>Unfalsifiable core with falsifiable periphery</td>
-<td>Unfalsifiable core (&ldquo;scaling leads to AGI&rdquo;) with falsifiable periphery</td>
-</tr>
-<tr>
-<td>Goalpost shifting when predictions fail</td>
-<td>Potential for goalpost shifting when benchmarks plateau</td>
-</tr>
-<tr>
-<td>Convergent confidence among brilliant people</td>
-<td>Convergent confidence among brilliant people</td>
-</tr>
-<tr>
-<td>Institutional incentives aligned with paradigm</td>
-<td>Financial incentives aligned with short timelines</td>
-</tr>
-</tbody>
-</table>
+<p>The mechanisms of failure are instructive: mathematical elegance treated as empirical confirmation (Witten: <em>&ldquo;too many nice things have happened in string theory for it to be all wrong&rdquo;</em>); an unfalsifiable core with falsifiable periphery (when SUSY failed, theorists retreated to &ldquo;string theory doesn&rsquo;t actually predict low-energy SUSY&rdquo;); goalpost shifting (predicted mass scales rose with each null result); and institutional lock-in (hiring, grants, and prestige concentrated in the paradigm).
+| String Theory | AI Timelines |
+|--------------|-------------|
+| Scaling laws elegant and predictive in-sample | Scaling laws elegant and predictive in-sample |
+| Unfalsifiable core with falsifiable periphery | Unfalsifiable core (&ldquo;scaling leads to AGI&rdquo;) with falsifiable periphery |
+| Goalpost shifting when predictions fail | Potential for goalpost shifting when benchmarks plateau |
+| Convergent confidence among brilliant people | Convergent confidence among brilliant people |
+| Institutional incentives aligned with paradigm | Financial incentives aligned with short timelines |</p>
 <p>And there&rsquo;s an even more direct precedent: <strong>the founders of AI themselves.</strong> Herbert Simon predicted in 1965 that <em>&ldquo;machines will be capable, within twenty years, of doing any work a man can do.&rdquo;</em> Marvin Minsky predicted in 1970 that a machine with <em>&ldquo;the general intelligence of an average human being&rdquo;</em> could be built within 3-8 years. They were wrong for 60+ years. The current generation says &ldquo;but we have fundamentally better tools&rdquo; — which is exactly what each previous generation said about <em>their</em> tools.</p>
 <p>None of this proves current AI timeline estimates are wrong. It shows that <strong>convergent confidence among brilliant people, in the absence of a mechanistic path to the goal, is not reliable evidence by itself.</strong> The question is not &ldquo;do smart people agree?&rdquo; but &ldquo;can anyone describe the specific mechanism by which the remaining gaps close?&rdquo;</p>
 <hr>
