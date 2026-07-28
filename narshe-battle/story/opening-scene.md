@@ -80,11 +80,11 @@
 
 ---
 
-*Inside. Narrow streets cut from stone. Snow on the rooftops. Lamplight from the windows — the warm kind, the kind that means people inside.*
+*Inside the mountain. The old mine descends beneath the town: dark stone, abandoned rails, frost silvering the upper ledges.*
 
-*Deeper in. A small square near the old wellhead.*
+*Deeper in. A broad chamber rises toward a sheltered shelf at the far end.*
 
-*There — a shape in the snow. Silver-white. Luminous. Not quite animal, not quite anything else. It sits very still.*
+*There — a shape in the frost. Silver-white. Luminous. Not quite animal, not quite anything else. It sits very still.*
 
 *Three children around it. One leaning against its side. One braiding something into its fur. One — a girl, maybe ten — sitting cross-legged in front of it, talking quietly.*
 
