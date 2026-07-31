@@ -138,10 +138,19 @@ function seeded(seed) {
   };
 }
 
-function createTexture({ THREE, renderer, definition }) {
+function createTexture({ THREE, renderer, definition, pending }) {
   let texture;
   if (definition.url) {
-    texture = new THREE.TextureLoader().load(definition.url);
+    // Fetched skins report readiness so an entry curtain can hold until the
+    // floor is actually dressed; a failed fetch settles rather than hangs.
+    let settle;
+    if (pending) pending.push(new Promise(resolve => { settle = resolve; }));
+    texture = new THREE.TextureLoader().load(
+      definition.url,
+      () => settle && settle(),
+      undefined,
+      () => settle && settle(),
+    );
   } else {
     const random = seeded(definition.seed);
     const canvas = document.createElement("canvas");
@@ -176,11 +185,11 @@ function createTexture({ THREE, renderer, definition }) {
   return texture;
 }
 
-function createMaterials({ THREE, renderer, skin }) {
+function createMaterials({ THREE, renderer, skin, pending }) {
   const textures = Object.fromEntries(
     Object.entries(skin.textures).map(([name, definition]) => [
       name,
-      createTexture({ THREE, renderer, definition }),
+      createTexture({ THREE, renderer, definition, pending }),
     ]),
   );
   return Object.fromEntries(
@@ -235,8 +244,10 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
   group.userData.terrainSkinId = skin.id;
   scene.add(group);
 
-  const materials = createMaterials({ THREE, renderer, skin });
+  const pending = [];
+  const materials = createMaterials({ THREE, renderer, skin, pending });
   const environment = addEnvironment({ THREE, scene, skin, group });
+  const ready = Promise.all(pending);
 
   function box(width, height, depth, material, x, y, z, cast = true) {
     const mesh = new THREE.Mesh(
@@ -527,6 +538,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
     materials,
     environment,
     anchors: map.anchors,
+    ready,
     box,
     rock,
   };

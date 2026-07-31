@@ -160,9 +160,13 @@
   /* FFT-style speech bubble, anchored to the speaking unit (ramza_dialogue.png) */
   #dlg { position: fixed; inset: 0; display: none; z-index: 40; cursor: pointer; }
   #dlg.show { display: block; }
+  /* battle barks share the bubble's entire visual language but are inert:
+     no overlay, no input capture, they place and expire on their own */
+  #bark { position: fixed; inset: 0; display: block; pointer-events: none; z-index: 45; }
+  #bark .dpanel { transition: opacity 200ms; }
   /* sized off ramza_dialogue.png: the bubble owns a large slice of the screen and
      the portrait is big enough to read a face at a glance */
-  #dlg .dpanel {
+  :is(#dlg, #bark) .dpanel {
     position: absolute; box-sizing: border-box; width: 900px; max-width: 93vw; padding: 18px 26px 14px;
     background: linear-gradient(180deg, #f7f0dd 0%, #efe5cc 100%);
     border: 2px solid #b3a382; border-radius: 15px;
@@ -170,31 +174,31 @@
     display: flex; gap: 18px; align-items: center;
   }
   /* portrait column: the name sits centred over the face, as its caption */
-  #dlg .dport { width: 150px; flex: none; align-self: flex-start; text-align: center; }
-  #dlg .facecrop {
+  :is(#dlg, #bark) .dport { width: 150px; flex: none; align-self: flex-start; text-align: center; }
+  :is(#dlg, #bark) .facecrop {
     width: 150px; height: 150px; overflow: hidden;
     border-radius: 10px; border: 2px solid #b3a382;
     background: #e3d8bd; box-shadow: 0 2px 8px rgba(30,26,14,0.35);
   }
-  #dlg .dport img {
+  :is(#dlg, #bark) .dport img {
     display: block; width: 100%; height: 100%; object-fit: cover;
     transform-origin: 50% 50%;
     transform: translate(var(--portrait-x, 0px), var(--portrait-y, 0px))
                scale(var(--portrait-scale, 1));
   }
-  #dlg .dmain { flex: 1; min-width: 0; }
-  #dlg .spk { font-weight: 700; font-size: 19px; color: #6b5a38; letter-spacing: 0.03em; margin-bottom: 7px; }
-  #dlg .ln { font-size: 22px; line-height: 1.58; color: #38301f; min-height: 1.4em; }
-  #dlg .adv { font-size: 11px; letter-spacing: 0.16em; color: #a08f6b; text-align: right; margin-top: 6px; }
-  #dlg .tail {
+  :is(#dlg, #bark) .dmain { flex: 1; min-width: 0; }
+  :is(#dlg, #bark) .spk { font-weight: 700; font-size: 19px; color: #6b5a38; letter-spacing: 0.03em; margin-bottom: 7px; }
+  :is(#dlg, #bark) .ln { font-size: 22px; line-height: 1.58; color: #38301f; min-height: 1.4em; }
+  :is(#dlg, #bark) .adv { font-size: 11px; letter-spacing: 0.16em; color: #a08f6b; text-align: right; margin-top: 6px; }
+  :is(#dlg, #bark) .tail {
     position: absolute; width: 0; height: 0;
     border-left: 15px solid transparent; border-right: 15px solid transparent;
   }
-  #dlg .tail.up { top: -18px; border-bottom: 19px solid #b3a382; }
-  #dlg .tail.up::after { content: ""; position: absolute; left: -12px; top: 3.5px;
+  :is(#dlg, #bark) .tail.up { top: -18px; border-bottom: 19px solid #b3a382; }
+  :is(#dlg, #bark) .tail.up::after { content: ""; position: absolute; left: -12px; top: 3.5px;
     border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 16px solid #f7f0dd; }
-  #dlg .tail.down { bottom: -18px; border-top: 19px solid #b3a382; }
-  #dlg .tail.down::after { content: ""; position: absolute; left: -12px; bottom: 3.5px;
+  :is(#dlg, #bark) .tail.down { bottom: -18px; border-top: 19px solid #b3a382; }
+  :is(#dlg, #bark) .tail.down::after { content: ""; position: absolute; left: -12px; bottom: 3.5px;
     border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 16px solid #efe5cc; }
   #audioWrap { position: fixed; bottom: 92px; left: 24px; user-select: none; }
   #audioBtn.muted { opacity: 0.4; text-decoration: line-through; }
@@ -341,7 +345,7 @@
   #turnstrip, #actionbar, #unitpanel, #dlg, #forecast, #overlay, .hint, .rot-btn {
     font-family: var(--ui);
   }
-  .caps, .upName, .fcName, .chip .nm, #dlg .spk, #turnstrip .hdr {
+  .caps, .upName, .fcName, .chip .nm, :is(#dlg, #bark) .spk, #turnstrip .hdr {
     font-family: var(--ui); font-variant: normal; letter-spacing: 0.02em;
   }
   .chip .nm { font-weight: 640; font-size: 12.5px; }
@@ -352,10 +356,10 @@
   /* The bubble is the one place that keeps a book face: the system sans reads
      clinical against parchment. Everything else in the UI stays on --ui. */
   :root { --dlg: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; }
-  #dlg .spk { font-family: var(--dlg); font-weight: 700; font-size: 17px; letter-spacing: 0.03em;
+  :is(#dlg, #bark) .spk { font-family: var(--dlg); font-weight: 700; font-size: 17px; letter-spacing: 0.03em;
     margin-bottom: 6px; text-align: center; }
-  #dlg .ln { font-family: var(--dlg); font-size: 22px; line-height: 1.58; font-weight: 400; color: #3b3020; }
-  #dlg .adv { font-family: var(--ui); font-size: 11.5px; }
+  :is(#dlg, #bark) .ln { font-family: var(--dlg); font-size: 22px; line-height: 1.58; font-weight: 400; color: #3b3020; }
+  :is(#dlg, #bark) .adv { font-family: var(--ui); font-size: 11.5px; }
   .upRole, .fcRole { font-family: var(--ui); letter-spacing: 0.04em; }
   .fcMid .lab { font-family: var(--ui); letter-spacing: 0.14em; }
   .upStatus span { font-family: var(--ui); letter-spacing: 0.06em; }
@@ -401,7 +405,7 @@
      A stage direction from the script is nobody's line: no portrait, no tail, no
      speaker. It gets a slim parchment strip across the middle of the frame, in
      the same book face as the bubbles but italic, and advances the same way. */
-  #dlg .npanel {
+  :is(#dlg, #bark) .npanel {
     position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
     box-sizing: border-box; width: 660px; max-width: 88vw; padding: 15px 34px 9px;
     background: linear-gradient(180deg, #f7f0dd 0%, #efe5cc 100%);
@@ -409,23 +413,23 @@
     box-shadow: 0 4px 0 #8d7d5c, 0 12px 30px rgba(30,26,14,0.45);
     text-align: center;
   }
-  #dlg .npanel .ntext {
+  :is(#dlg, #bark) .npanel .ntext {
     font-family: var(--dlg); font-style: italic; font-size: 19.5px; line-height: 1.55; color: #4a4029;
   }
-  #dlg .npanel .adv { text-align: center; margin-top: 8px; }
-  #dlg .tbcard {
+  :is(#dlg, #bark) .npanel .adv { text-align: center; margin-top: 8px; }
+  :is(#dlg, #bark) .tbcard {
     position: absolute; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 20px;
     background: rgba(6,8,16,0.9);
   }
-  #dlg .tbcard .w {
+  :is(#dlg, #bark) .tbcard .w {
     font-family: Georgia, 'Times New Roman', serif; font-variant: small-caps;
     letter-spacing: 0.32em; font-size: 42px; color: #e8eeff; text-indent: 0.32em;
     text-shadow: 0 4px 26px rgba(0,0,0,0.9);
   }
-  #dlg .tbcard .adv { color: #7d88a8; }
+  :is(#dlg, #bark) .tbcard .adv { color: #7d88a8; }
   /* one panel at a time: the plain bubble is the default, classes swap it out */
-  #dlg .npanel, #dlg .tbcard { display: none; }
+  :is(#dlg, #bark) .npanel, :is(#dlg, #bark) .tbcard { display: none; }
   #dlg.narr .dpanel, #dlg.tbc .dpanel, #dlg.blank .dpanel { display: none; }
   #dlg.narr .npanel { display: block; }
   #dlg.tbc .tbcard { display: flex; }
@@ -497,6 +501,7 @@
     <div class="hint">M</div>
   </div>
 </div>
+<div id="bark"></div>
 <div id="dlg">
   <div class="dpanel">
     <div class="tail up"></div>
@@ -1043,6 +1048,27 @@ box(W + 2.4, 0.22, D + 2.4, mat.plinth, W / 2, -0.62, D / 2);
 // its coordinates on the room origin, so the whole group translates to the grid
 // centre and rises until its slab tops meet the engine floor.
 let warbellAnchors = null;
+let gallerySkinReady = Promise.resolve();
+// Cinematic plates for the bell entrance preload with everything else — the
+// no-cap entry card waits for these too. Failures settle rather than hang.
+let wbPlatesReady = Promise.resolve();
+const wbPlateTex = {};
+if (WARBELL) {
+  const plateLoads = [];
+  for (const [key, path] of [
+    ['bell', 'art/runtime/review/bonded_defender_cragbeast/warning_bell.png'],
+    ['sentry', 'art/runtime/sprites/miner_front.png'],
+    ['sentryStep', 'art/runtime/sprites/miner_front_walk1.png'],
+    ['sentryStep2', 'art/runtime/sprites/miner_front_walk5.png'],
+  ]) {
+    plateLoads.push(new Promise(resolve => new THREE.TextureLoader().load(path, tex => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      wbPlateTex[key] = tex;
+      resolve();
+    }, undefined, () => resolve())));
+  }
+  wbPlatesReady = Promise.all(plateLoads);
+}
 if (WARBELL) {
   const kit = buildTerrainKit({
     THREE, renderer, scene: world,
@@ -1051,6 +1077,7 @@ if (WARBELL) {
   const slabTop = warningBellGalleryMap.grid.surfaceY + warningBellGalleryMap.grid.slabHeight / 2;
   kit.group.position.set(W / 2, (1 * HU + topThick) - slabTop, D / 2);
   warbellAnchors = kit.anchors || null;
+  gallerySkinReady = kit.ready;      // the entry card holds until the floor is dressed
 }
 
 // ---------------------------------------------------------------- rugged buildings
@@ -2053,15 +2080,20 @@ function sameQuad(mesh, f) {
 function setArtFrame(u, f) {
   const m = u.sprite.material;
   m.map = f.tex; m.transparent = true; m.alphaTest = 0.4; m.needsUpdate = true;
-  if (!sameQuad(u.sprite, f)) {
+  // A unit is one tile; a plate wider than artMaxW shrinks uniformly until it
+  // fits its footprint (Skarn's broad silhouette was spilling over neighbors).
+  let h = ART_H, w = ART_H * f.aspect;
+  if (u.artMaxW && w > u.artMaxW) { h = u.artMaxW / f.aspect; w = u.artMaxW; }
+  if (!sameQuad(u.sprite, f) || Math.abs((u.sprite.userData.artH || 0) - h) > 1e-6) {
     u.sprite.geometry.dispose();
-    u.sprite.geometry = new THREE.PlaneGeometry(ART_H * f.aspect, ART_H);
+    u.sprite.geometry = new THREE.PlaneGeometry(w, h);
   }
   u.sprite.userData.artFrame = f;
+  u.sprite.userData.artH = h;
   u.sprite.userData.solid = f.solid;
   u.sprite.rotation.x = 0;
-  u.sprite.position.set(0, ART_H / 2, 0);       // image bottom sits on the tile top
-  u.topY = ART_H;
+  u.sprite.position.set(0, h / 2, 0);           // image bottom sits on the tile top
+  u.topY = h;
   layoutOverhead(u);
 }
 // no _down was drawn for this character: tip the standing figure back onto the
@@ -2385,7 +2417,7 @@ const artReady = (async () => {
       // The bonded pair's plates are review candidates consumed in place —
       // never copied into art/sprites/ or the runtime manifest. Fronts are
       // required; sides and walks are the usual optional enhancement.
-      const RV = 'art/review/bonded_defender_cragbeast/sprites/';
+      const RV = 'art/runtime/review/bonded_defender_cragbeast/sprites/';
       // The defender consumes the aggressive-identity set (Codex, 562d00a):
       // rotations and two-frame review-pilot gaits keyed to the accepted
       // front. Files from the superseded pre-aggressive design are never
@@ -2513,8 +2545,9 @@ function addUnit(def) {
     id: uid++, name: def.name, role: def.role, team: def.team, cls: def.cls,
     x: def.x, z: def.z, hp: def.hp, atk: def.atk,
     move: def.move, speed: def.speed, range: def.range || 1,
-    abil: def.abil || [], downable: def.team === 'enemy',
+    abil: def.abil || [], downable: def.downable ?? (def.team === 'enemy'),
   }), {
+    artMaxW: def.artMaxW || 0,       // clamp a wide plate to its one tile (Skarn)
     pal: def.pal, kind: def.kind,
     chipColor: '#' + PALETTE[def.pal].accent.toString(16).padStart(6, '0'),
     group, fig, mats, sprite: mesh, flip: 1,
@@ -2600,12 +2633,15 @@ const HEAL_RANGE = 3;
 let BERSERK_MULT = wbNum('berserk', 2);  // survivor damage multiplier once its partner falls
 const BERSERK_HOT = new THREE.Color(0xff2a18);  // the arcade rage-pulse red
 let SOLO_REVENGE = QUERY.get('solorev') !== '0';  // the berserk survivor also avenges itself
+// Not militia: a felled bond partner leaves the field (downable false ->
+// unitDefeated -> fade out), per Jonah — downed-not-dead stays a Battle 1
+// militia doctrine. Skarn's wide plate is clamped to read as ONE tile.
 const WB_CAPTAIN = { name: 'Ragna', role: 'Type 8 · Quarry Champion', team: 'enemy', cls: 'champion',
                      kind: 'knight', pal: 'defender', hp: wbNum('chp', 72), atk: wbNum('catk', 14),
-                     move: 4, speed: 6, range: 1, abil: [] };
+                     move: 4, speed: 6, range: 1, abil: [], downable: false };
 const WB_BEAST = { name: 'Skarn', role: 'Bonded Cragbeast', team: 'enemy', cls: 'beast',
                    kind: 'knight', pal: 'cragbeast', hp: wbNum('bhp', 84), atk: wbNum('batk', 12),
-                   move: 3, speed: 4, range: 1, abil: [] };
+                   move: 3, speed: 4, range: 1, abil: [], downable: false, artMaxW: 1.22 };
 
 if (WARBELL) {
   // The trio carries its Battle 1 kit; Seira opens with the 3 TP her scripted
@@ -2620,8 +2656,10 @@ if (WARBELL) {
   addUnit({ ...WB_CAPTAIN, x: 6, z: 2 });
   addUnit({ ...WB_BEAST, x: 7, z: 2 });
 
-  // Jonah's live tuning panel. The top group applies instantly mid-battle;
-  // enemy stats need a restart, which reloads with every value in the URL.
+  // Jonah's live tuning panel — dev chrome, gated behind &tune=1 so
+  // playtesters never see it (Jonah, 2026-07-31). The knobs themselves stay
+  // URL-seeded either way.
+  if (QUERY.get('tune') === '1') {
   const wb = { chp: WB_CAPTAIN.hp, catk: WB_CAPTAIN.atk, bhp: WB_BEAST.hp, batk: WB_BEAST.atk };
   const panel = document.createElement('details');
   panel.id = 'wbTune';
@@ -2665,6 +2703,7 @@ if (WARBELL) {
   });
   panel.appendChild(btn);
   document.body.appendChild(panel);
+  }
 } else {
 // Three imperials against six miners: the FF6-opening asymmetry, stated in stats.
 addUnit({ name: 'Cassien', role: 'Type 1 · Knight', team: 'player', cls: 'knight', kind: 'knight', pal: 'cassien',
@@ -2819,7 +2858,7 @@ const matC = {
   win:      new THREE.MeshStandardMaterial({ color: 0xffc078, emissive: 0xff9430, emissiveIntensity: 1.9 }),
   beam:     new THREE.MeshStandardMaterial({ color: CTINT.beam, roughness: 1 }),
 };
-if (CLIFFS_AUTHORED && !WARBELL && !REVIEW_MINE && !REVIEW_BATTLE) {
+if (CLIFFS_AUTHORED && !WARBELL && !REVIEW_MINE && !REVIEW_BATTLE && QUERY.get('tune') === '1') {
   // Jonah's tint dials for the stopgap intro reskin: brightness multipliers
   // over the committed dusk tints with live hex readouts, so the winning
   // values can be read straight off the panel and committed. Dev chrome only;
@@ -3145,13 +3184,13 @@ function addMineSpriteActor(name, path, x, z, height, yaw = Math.PI) {
 // The songbeast and children occupy the esper's exact narrative slot: a compact
 // upper grouping, well above and beyond the arriving imperial triangle.
 const mineSongbeast = addMineSpriteActor('Songbeast',
-  'art/review/mine_songbeast/sprites/songbeast_front.png', 6.0, 15.45, 2.36);
+  'art/runtime/review/mine_songbeast/sprites/songbeast_front.png', 6.0, 15.45, 2.36);
 const mineLenne = addMineSpriteActor('Lenne',
-  'art/review/mine_songbeast/sprites/lenne_front.png', 5.05, 13.62, 1.36);
+  'art/runtime/review/mine_songbeast/sprites/lenne_front.png', 5.05, 13.62, 1.36);
 const mineOlderChild = addMineSpriteActor('Older Child',
-  'art/review/mine_songbeast/sprites/child_older_front.png', 4.18, 14.55, 1.31);
+  'art/runtime/review/mine_songbeast/sprites/child_older_front.png', 4.18, 14.55, 1.31);
 const mineYoungerChild = addMineSpriteActor('Younger Child',
-  'art/review/mine_songbeast/sprites/child_younger_front.png', 7.48, 14.35, 1.25);
+  'art/runtime/review/mine_songbeast/sprites/child_younger_front.png', 7.48, 14.35, 1.25);
 
 function makeResonanceAura(color) {
   const tex = makeTex((ctx, s) => {
@@ -3226,7 +3265,7 @@ async function loadMinePortrait(key, path) {
 
 const mineArtReady = Promise.all([
   ...mineSpriteActors.map(loadMineSprite),
-  loadMinePortrait('lenne', 'art/review/mine_songbeast/anime/lenne.png'),
+  loadMinePortrait('lenne', 'art/runtime/review/mine_songbeast/anime/lenne.png'),
 ]).catch(err => console.warn('Mine art did not fully load:', err));
 
 const MINE_PARTY_HOME = new Map(minePartyActors.map(a =>
@@ -3537,6 +3576,8 @@ function enterCliffs() {
 if (WARBELL || REVIEW_BATTLE) showScene('town');
 else if (REVIEW_MINE) showScene('mine');
 else enterCliffs();
+// The card names the place being entered: the gallery battle is in the mines.
+if (WARBELL) document.querySelector('#splash span').textContent = 'NARSHE MINES';
 
 
 function unitAt(x, z) { return units.find(u => u.alive && u.x === x && u.z === z); }
@@ -4217,6 +4258,7 @@ function presentBattleEvents(events, color) {
       if (WARBELL && (u.cls === 'champion' || u.cls === 'beast')) berserkSurvivor(u);
     } else if (ev.type === 'unitDefeated') {
       killUnitView(u);
+      if (WARBELL && (u.cls === 'champion' || u.cls === 'beast')) berserkSurvivor(u);
     } else if (ev.type === 'tpSpent') {
       renderStrip();
     } else if (ev.type === 'statusAdded' || ev.type === 'statusRemoved') {
@@ -4243,28 +4285,31 @@ function applyDamage(def, dmg, color, sourceId = null, kind = 'attack') {
 // hurt the captain and the beast answers. The revenge is a FIXED amount —
 // never proportional — so many small hits cost more than one prepared blow.
 // A stone answers a distant attacker; a lunge answers an adjacent one.
-// FFT-style battle bark: a self-dismissing parchment bubble at the speaker.
-// Deliberately OUTSIDE the modal dialogue system — a war cry must never halt
-// play — and on plain timers, not the gameplay scheduler: pure UI ephemera
-// should fade out even across a scene change rather than be orphaned by
-// cancelAll.
+// FFT-style battle bark: the SAME parchment panel as story dialogue (shared
+// CSS via #bark, shared placement via placeBubblePanel) but inert — no
+// overlay, no input capture, it tracks its speaker each frame and expires on
+// its own. Plain timers, not the gameplay scheduler: pure UI ephemera should
+// fade out even across a scene change rather than be orphaned by cancelAll.
+const activeBarks = [];
 function bark(u, text, portraitSrc) {
-  const v = new THREE.Vector3(u.group.position.x, u.group.position.y + (u.topY || 2) + 0.4,
-    u.group.position.z).project(camera);
   const el = document.createElement('div');
-  el.style.cssText = 'position:fixed;z-index:70;transform:translate(-50%,-100%);max-width:290px;' +
-    'background:linear-gradient(180deg,#f7f0dd,#efe5cc);border:2px solid #b8a578;border-radius:9px;' +
-    'box-shadow:0 3px 10px rgba(30,26,14,0.4);padding:8px 10px;display:flex;gap:9px;align-items:center;' +
-    'font:13px -apple-system,"Segoe UI",sans-serif;color:#2e2618;pointer-events:none;opacity:0;transition:opacity 160ms';
-  el.style.left = Math.max(160, Math.min(innerWidth - 160, (v.x + 1) / 2 * innerWidth)) + 'px';
-  el.style.top = Math.max(90, (1 - v.y) / 2 * innerHeight) + 'px';
-  el.innerHTML = (portraitSrc
-      ? `<img src="${portraitSrc}" style="width:46px;height:46px;border-radius:6px;border:1px solid #b8a578;object-fit:cover">`
-      : '') +
-    `<div><b style="color:#7a5a28">${u.name}</b><br>${text}</div>`;
-  document.body.appendChild(el);
-  requestAnimationFrame(() => { el.style.opacity = '1'; });
-  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2600);
+  el.className = 'dpanel';
+  el.innerHTML = '<div class="tail up"></div>' +
+    '<div class="dport"><div class="spk caps">' + u.name + '</div>' +
+    '<div class="facecrop">' + (portraitSrc ? '<img alt="" src="' + portraitSrc + '">' : '') + '</div></div>' +
+    '<div class="dmain"><div class="ln">' + text + '</div></div>';
+  document.getElementById('bark').appendChild(el);
+  activeBarks.push({ el, u, until: performance.now() + 3000 });
+  placeBubblePanel(el, u);
+}
+function updateBarks() {
+  for (let i = activeBarks.length - 1; i >= 0; i--) {
+    const b = activeBarks[i];
+    placeBubblePanel(b.el, b.u);
+    const age = performance.now() - b.until;
+    if (age > 0) b.el.style.opacity = '0';
+    if (age > 300) { b.el.remove(); activeBarks.splice(i, 1); }
+  }
 }
 // When one of the bonded pair falls, the survivor's grief turns violent: its
 // attacks scale by BERSERK_MULT from that point (forecasts see it too, since
@@ -4280,7 +4325,7 @@ function berserkSurvivor(fallen) {
   survivor.ring.material.color.setHex(uiCol(0xff2412));
   banner(survivor.name, 'BERSERK');
   floatText('BERSERK', tileCenter(survivor.x, survivor.z).add(new THREE.Vector3(0, 2.05, 0)), '#ff5030');
-  const RVP = 'art/review/bonded_defender_cragbeast/portraits/';
+  const RVP = 'art/runtime/review/bonded_defender_cragbeast/portraits/';
   bark(survivor,
     survivor.cls === 'champion' ? 'SKARN—! ...All of you. ALL OF YOU.' : 'RRRAAAGH—!',
     RVP + (survivor.cls === 'champion'
@@ -4788,6 +4833,7 @@ const BASE_PORTRAIT_FRAMES = {
 function portraitOf(who) {
   const k = who.toLowerCase();
   if (k === 'lenne' || k === 'girl') return minePortraits.lenne || null;
+  if (k === 'ragna') return portraits.ragna || null;
   if (PORTRAIT_KEYS.includes(k)) return portraits[k] || artPortrait(k);
   if (k.includes('guard')) return portraits.guard || artPortrait('guard');
   return null;
@@ -4875,6 +4921,14 @@ const portraitsReady = (async () => {
   await Promise.all([
     ...PORTRAIT_KEYS.slice(1).map(loadBase),
     loadDialogueSet(),
+    (async () => {
+      // Ragna's dialogue face is her accepted review candidate, consumed
+      // compact and in place, until the art lane lands a canonical
+      // portraits/ragna.png (which would then win by key).
+      if (!WARBELL) return;
+      const url = await loadPath('art/runtime/review/bonded_defender_cragbeast/portraits/defender_type8_aggressive_candidate.png');
+      if (url) portraits.ragna = url;
+    })(),
   ]);
   // The suspicious portrait is the accepted baseline Brecht depiction, not a
   // one-line expression variant. It therefore supplies dialogue, forecasts, and
@@ -4980,6 +5034,28 @@ function endDialogue() {
   clearDialogue();
   if (d) d();
 }
+// FFT placement below the sprite, tail up, flipped above when cramped —
+// shared verbatim by the story bubble and the battle barks so they can never
+// drift apart visually (Jonah: one bubble form everywhere).
+function placeBubblePanel(panel, unit) {
+  const tail = panel.querySelector('.tail');
+  const w = panel.offsetWidth || 420, h = panel.offsetHeight || 100;
+  // read the live group position rather than the tile: it works for the cliffs
+  // actors, which have no grid coordinates at all
+  const p = unit.group.position;
+  const head = new THREE.Vector3(p.x, p.y + 2.0, p.z).project(camera);
+  const feet = new THREE.Vector3(p.x, p.y, p.z).project(camera);
+  const sx = (head.x + 1) / 2 * innerWidth;
+  const syTop = (1 - head.y) / 2 * innerHeight, syBot = (1 - feet.y) / 2 * innerHeight;
+  let bx = Math.min(Math.max(sx - w * 0.38, 10), innerWidth - w - 10);
+  let by = syBot + 20;                                  // FFT default: below the sprite, tail up
+  let up = true;
+  if (by + h > innerHeight - 90) { by = syTop - h - 24; up = false; }   // flip above when cramped
+  panel.style.left = bx + 'px';
+  panel.style.top = Math.max(10, by) + 'px';
+  tail.className = 'tail ' + (up ? 'up' : 'down');
+  tail.style.left = Math.min(Math.max(sx - bx - 11, 18), w - 40) + 'px';
+}
 // keep the bubble glued to the speaker through camera glides and rotation
 function placeDlgBubble() {
   if (!dlgLines || !dlgSpeaker) return;
@@ -4994,21 +5070,7 @@ function placeDlgBubble() {
     return;
   }
   tail.style.display = '';
-  // read the live group position rather than the tile: it works for the cliffs
-  // actors, which have no grid coordinates at all
-  const p = dlgSpeaker.group.position;
-  const head = new THREE.Vector3(p.x, p.y + 2.0, p.z).project(camera);
-  const feet = new THREE.Vector3(p.x, p.y, p.z).project(camera);
-  const sx = (head.x + 1) / 2 * innerWidth;
-  const syTop = (1 - head.y) / 2 * innerHeight, syBot = (1 - feet.y) / 2 * innerHeight;
-  let bx = Math.min(Math.max(sx - w * 0.38, 10), innerWidth - w - 10);
-  let by = syBot + 20;                                  // FFT default: below the sprite, tail up
-  let up = true;
-  if (by + h > innerHeight - 90) { by = syTop - h - 24; up = false; }   // flip above when cramped
-  panel.style.left = bx + 'px';
-  panel.style.top = Math.max(10, by) + 'px';
-  tail.className = 'tail ' + (up ? 'up' : 'down');
-  tail.style.left = Math.min(Math.max(sx - bx - 11, 18), w - 40) + 'px';
+  placeBubblePanel(panel, dlgSpeaker);
 }
 function advanceDialogue() {
   if (!dlgLines) return;
@@ -5047,8 +5109,9 @@ function checkEnd() {
 function warbellOpeningBeats() {
   const seira = units.find(v => v.name === 'Seira');
   return [
+    { kind: 'fx', skippable: false, run: finish => warbellBellEntrance(finish) },
     { kind: 'line', who: 'Ragna', text: 'Ha! Would you look at that — the Empire feeds us now! Three soldiers, armor and all. Skarn loves the crunchy ones.' },
-    { kind: 'line', who: 'Seira', text: 'They rang their bell for us. Let me make the first move — I can prove I belong here.' },
+    { kind: 'line', who: 'Seira', text: 'I can end this before it becomes a fight.' },
     { kind: 'line', who: 'Cassien', text: 'Seira, hold position—' },
     { kind: 'fx', skippable: false, run: finish => warbellScriptedCry(seira, finish) },
     { kind: 'line', who: 'Ragna', text: '...You hurt him. You walked into MY mine and you hurt MY beast.' },
@@ -5070,6 +5133,101 @@ function warbellScriptedCry(u, finish) {
   moveUnit(u, [[6, 7], [6, 6], [6, 5], [6, 4]], () => {
     castCry(u, () => later(finish, 600));
   });
+}
+// ---- bell entrance (Jonah's staging, unlocked by the captain's plates): a
+// sentry spots the party, runs to the warning bell, rings it, and flees into
+// the dark; only then do Ragna and Skarn walk out of the shaft together — the
+// pair entering as one is the visual statement of the bond the retaliation
+// rules then teach.
+// The gallery floor is flat, so cinematic props may sit at fractional grid
+// coordinates: height comes from one known-good tile, never from indexing
+// tileTop with a fraction.
+function wbFloorPos(x, z) {
+  return new THREE.Vector3(x + 0.5, tileTop[2][6], z + 0.5);
+}
+function wbCineBillboard(texKey, height, x, z) {
+  const tex = wbPlateTex[texKey];
+  const aspect = tex && tex.image ? tex.image.width / tex.image.height : 0.6;
+  const material = new THREE.MeshBasicMaterial({
+    map: tex || null, transparent: true, alphaTest: 0.08,
+    side: THREE.DoubleSide, toneMapped: false, fog: true,
+  });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(height * aspect, height), material);
+  mesh.position.y = height / 2;
+  const group = new THREE.Group();
+  group.add(mesh);
+  group.position.copy(wbFloorPos(x, z));
+  world.add(group);
+  const b = { group, mesh, material };
+  wbCineBillboards.push(b);          // yawed to the camera every frame like units
+  return b;
+}
+const wbCineBillboards = [];
+function warbellBellEntrance(finish) {
+  const gx = k => k + W / 2, gz = k => k + D / 2;      // kit-local anchor -> grid
+  const bellA = (warbellAnchors && warbellAnchors.warningBell) || [2.28, 1.22, -5.13];
+  const bell = wbCineBillboard('bell', 1.15, gx(bellA[0]) - 0.5, gz(bellA[2]) - 0.5);
+  bell.mesh.position.y = (bellA[1] || 1.22) + 0.35;     // hangs from the shaft frame, not floor-standing
+  const sentry = wbCineBillboard('sentry', 1.5, 4.6, 7.2);
+  const ragna = units.find(v => v.name === 'Ragna');
+  const skarn = units.find(v => v.name === 'Skarn');
+  // the pair is UNSEEN in the dark of the shaft until the bell has spoken
+  for (const [u, sx] of [[ragna, 6], [skarn, 7]]) {
+    u.x = sx; u.z = 0;
+    u.group.position.copy(tileCenter(sx, 0));
+    u.group.visible = false;
+    u.cutscene = true;                                  // unconditional gait for the entrance
+  }
+  centerOn(Math.round(gx(bellA[0]) - 1.5), Math.max(1, Math.round(gz(bellA[2]) + 2.6)), 1.0);
+  floatText('!', sentry.group.position.clone().add(new THREE.Vector3(0, 1.9, 0)), '#ffe08a');
+  const stepTex = [wbPlateTex.sentryStep, wbPlateTex.sentryStep2].filter(Boolean);
+  let stepFlip = null;
+  const sentrySlide = (to, dur, done) => {
+    const from = sentry.group.position.clone();
+    let step = 0;
+    if (stepTex.length && !stepFlip) stepFlip = setInterval(() => {
+      sentry.material.map = stepTex[step++ % stepTex.length];
+      sentry.material.needsUpdate = true;
+    }, 150);
+    tween(dur, p => sentry.group.position.lerpVectors(from, to, p), () => {
+      if (stepFlip) { clearInterval(stepFlip); stepFlip = null; }
+      sentry.material.map = wbPlateTex.sentry || null;
+      sentry.material.needsUpdate = true;
+      done();
+    });
+  };
+  sentrySlide(bell.group.position.clone().add(new THREE.Vector3(0.7, 0, 0.4)), 1.35, () => {
+    // three swings, three CLANGs — the encounter's namesake earns its title card
+    let swings = 0;
+    const swing = () => {
+      chimeBell();
+      floatText('CLANG!', bell.group.position.clone().add(new THREE.Vector3(0, 1.7, 0)), '#ffd79a');
+      tween(0.42, p => { bell.mesh.rotation.z = Math.sin(p * Math.PI * 2) * 0.28; }, () => {
+        bell.mesh.rotation.z = 0;
+        if (++swings < 3) swing();
+        else later(() => {
+          // the sentry bolts INTO the shaft — he is running to FETCH the
+          // rescue crew, and out of that same darkness they will come
+          sentrySlide(wbFloorPos(6.0, -0.4), 0.85, () => { world.remove(sentry.group); });
+          tween(0.85, p => { sentry.material.opacity = 1 - Math.max(0, (p - 0.55) / 0.45); });
+          sentry.material.transparent = true;
+          later(pairEntrance, 1050);
+        }, 420);
+      });
+    };
+    later(swing, 200);
+  });
+  function pairEntrance(){
+    centerOn(6, 3, 1.05);
+    ragna.group.visible = true;
+    skarn.group.visible = true;
+    moveUnit(ragna, [[6, 1], [6, 2]], () => { ragna.cutscene = false; faceToward(ragna, 6, 9); });
+    later(() => moveUnit(skarn, [[7, 1], [7, 2]], () => {
+      skarn.cutscene = false; faceToward(skarn, 7, 9);
+      cueBattleMusic();                    // Hoof and Horn lands with the pair on the field
+      later(finish, 550);
+    }), 380);
+  }
 }
 function warbellReprisalBeat(finish) {
   const held = wbHeldReprisals || [];
@@ -5613,8 +5771,33 @@ const musicReady = (async () => {
     } catch (err) { /* candidate missing or undecodable — try the next */ }
   }
 })();
+// The warning-bell battle holds its track until the pair has entered: the
+// bell and the sentry play against silence, and Hoof and Horn lands with
+// Ragna's entrance (Jonah). The splash gesture still resumes the context, so
+// the deferred start needs no further user action.
+let musicHeld = WARBELL;
+function cueBattleMusic() { musicHeld = false; startMusic(); }
+// A cast-bell strike, synthesized: a handful of inharmonic partials with
+// exponential decay. No audio asset exists or is needed for this.
+function chimeBell() {
+  if (!actx || actx.state !== 'running') return;
+  const t0 = actx.currentTime;
+  const out = actx.createGain();
+  out.gain.value = 0.22;
+  out.connect(actx.destination);
+  for (const [ratio, amp, dur] of [[1, 1, 1.6], [2.02, 0.55, 1.1], [2.94, 0.32, 0.8], [4.18, 0.18, 0.5]]) {
+    const osc = actx.createOscillator();
+    osc.frequency.value = 392 * ratio;
+    const g = actx.createGain();
+    g.gain.setValueAtTime(amp * 0.28, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(out);
+    osc.start(t0); osc.stop(t0 + dur);
+  }
+}
 function startMusic() {
   wantMusic = true;
+  if (musicHeld) { if (actx) actx.resume().catch(() => {}); return; }
   if (!musicBuf || !actx) return;
   // This succeeds immediately where autoplay is allowed. If the browser keeps
   // the context suspended, advanceDialogue() retries on the first real gesture.
@@ -5851,6 +6034,13 @@ function updateGame(dt, t) {
     const p = tgt.group.position;
     markMesh.position.set(p.x, p.y + tgt.topY - 0.428 + Math.sin(t * 3.4) * 0.06, p.z);
     markMesh.rotation.y = t * 1.6;
+  }
+  updateBarks();
+  // cinematic plates read flat unless they face the lens like every unit does
+  for (const b of wbCineBillboards) {
+    if (!b.group.parent) continue;
+    b.group.rotation.y = Math.atan2(camera.position.x - b.group.position.x,
+                                    camera.position.z - b.group.position.z);
   }
   // Berserk rage pulse (Jonah, after the arcade Rocksteady/Bebop language):
   // the accepted sprite itself throbs red in-engine — no transformed art, no
@@ -6497,20 +6687,21 @@ let splashDone = () => {
 };
 
 // ---------------------------------------------------------------- animate
-// The entry card is an opaque curtain, and it stays up until every delivered
-// sprite and portrait has decoded and been handed to its unit — so the painted
-// art is what the player sees first and the placeholders are never glimpsed. The
-// cap means a hung or corrupt file costs a few seconds, not the game; with no art
-// delivered at all both promises settle immediately and only the floor applies,
-// which is the pacing the card always had.
+// The entry card is an opaque curtain, and it stays up until EVERY delivered
+// asset has decoded and been handed to its consumer — so the painted art is
+// what the player sees first and placeholders are never glimpsed. There is
+// deliberately NO time cap (Jonah, 2026-07-31, after the published preview
+// lifted early on network loads): the loaders settle failed requests with
+// recorded errors instead of hanging, so a missing file cannot brick the
+// card — only honest waiting remains. The published payload is kept small by
+// the runtime compaction pipelines (art/runtime/), which is what makes this
+// wait short in practice.
 const REVIEW_ENTRY = REVIEW_MINE || REVIEW_BATTLE;
 const SPLASH_FLOOR = REVIEW_ENTRY ? 350 : 1700;
-const SPLASH_CAP = REVIEW_ENTRY ? 15000 : 6000;
 const SPLASH_FADE = 900;
-const assetsReady = Promise.race([
-  Promise.all([artReady, mineArtReady, portraitsReady, scriptReady, musicReady, terrainSkinReady]),
-  new Promise(res => setTimeout(res, SPLASH_CAP)),
-]);
+const assetsReady =
+  Promise.all([artReady, mineArtReady, portraitsReady, scriptReady, musicReady,
+               terrainSkinReady, gallerySkinReady, wbPlatesReady]);
 // tooling waits on these rather than guessing at the card's duration
 Object.assign(window.__BATTLE, { assetsReady, portraitsReady, opened });
 const clock = new THREE.Clock();
