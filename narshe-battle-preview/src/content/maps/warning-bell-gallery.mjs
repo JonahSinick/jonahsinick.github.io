@@ -61,16 +61,44 @@ export const warningBellGalleryMap = {
         step: 0.48,
       },
     },
-    { kind: "crate", position: [-4.35, 2.15], size: 0.68 },
-    { kind: "crate", position: [4.3, 2.75], size: 0.6 },
-    { kind: "ore-cart", position: [-4.25, -0.75] },
-    { kind: "ore-cart", position: [4.25, 0.25] },
-    { kind: "ore-seam", position: [-5.45, 1.25, -2.7] },
-    { kind: "ore-seam", position: [5.45, 1.55, -1.4] },
-    { kind: "ore-seam", position: [-3.9, 1.8, -5.55] },
-    { kind: "work-lamp", position: [-5.35, 1.1, 3.65] },
-    { kind: "work-lamp", position: [2.48, 1.1, -4.95] },
-    { kind: "work-lamp", position: [5.35, 1.1, 2.15] },
+    // Set dressing pared to what reads unambiguously (Jonah, 2026-07-31):
+    // crates, wall ore-seams, and work-lamps removed — the seams read as
+    // floating ice and the lamps as stray bronze spheres competing with the
+    // warning bell, which must stay the scene's only bronze. Carts are empty:
+    // parked haulers, not ice wagons.
+    // Props are kit GEOMETRY, tile-snapped: they occupy squares and rotate
+    // with the world (billboard plates read as straddling and turning
+    // wrongly — Jonah, 2026-07-31). Carts stay empty haulers.
+    { kind: "ore-cart", position: [-4, -1], empty: true },
+    { kind: "ore-cart", position: [4, 0], empty: true },
+    { kind: "crate", position: [-4, 2], size: 0.62 },
+    { kind: "crate", position: [4, 3], size: 0.56 },
+    { kind: "timber-brace", position: [-6.28, 1], along: "z" },
+    { kind: "timber-brace", position: [6.28, -2], along: "z" },
+    // The near (south) wall frames the scene when the camera swings to face
+    // it, and hides otherwise so it never obstructs the party's approach.
+    // Its plain timbered opening has no bell and no rock crown — the bell
+    // wall stays unmistakable.
+    {
+      kind: "cavern-walls",
+      viewGroup: "south",
+      near: {
+        from: -7,
+        to: 7,
+        step: 0.72,
+        z: 5.82,
+        gapHalfWidth: 1.42,
+      },
+    },
+    {
+      kind: "timbered-shaft",
+      viewGroup: "south",
+      position: [0, 1.05, 5.64],
+      opening: [2.55, 2.2],
+      postX: [-1.28, 1.28],
+      cap: [2.9, 0.26, 0.32],
+      faceZ: 5.5,
+    },
   ],
   anchors: {
     warningBell: [2.28, 1.22, -5.13],

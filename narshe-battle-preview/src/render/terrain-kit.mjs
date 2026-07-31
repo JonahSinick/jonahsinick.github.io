@@ -7,6 +7,7 @@ const MODULE_KINDS = new Set([
   "ore-cart",
   "ore-seam",
   "work-lamp",
+  "timber-brace",
 ]);
 const REQUIRED_MATERIALS = [
   "stone",
@@ -138,18 +139,24 @@ function seeded(seed) {
   };
 }
 
-function createTexture({ THREE, renderer, definition, pending }) {
+function createTexture({ THREE, renderer, definition, pending, errors, name }) {
   let texture;
   if (definition.url) {
     // Fetched skins report readiness so an entry curtain can hold until the
     // floor is actually dressed; a failed fetch settles rather than hangs.
+    // Settling silently would recreate the silent-partial-art failure mode,
+    // so a failure is also RECORDED: the caller routes these into whatever
+    // structured error channel it already shows.
     let settle;
     if (pending) pending.push(new Promise(resolve => { settle = resolve; }));
     texture = new THREE.TextureLoader().load(
       definition.url,
       () => settle && settle(),
       undefined,
-      () => settle && settle(),
+      () => {
+        if (errors) errors.push({ texture: name, url: definition.url });
+        if (settle) settle();
+      },
     );
   } else {
     const random = seeded(definition.seed);
@@ -185,11 +192,11 @@ function createTexture({ THREE, renderer, definition, pending }) {
   return texture;
 }
 
-function createMaterials({ THREE, renderer, skin, pending }) {
+function createMaterials({ THREE, renderer, skin, pending, errors }) {
   const textures = Object.fromEntries(
     Object.entries(skin.textures).map(([name, definition]) => [
       name,
-      createTexture({ THREE, renderer, definition, pending }),
+      createTexture({ THREE, renderer, definition, pending, errors, name }),
     ]),
   );
   return Object.fromEntries(
@@ -245,10 +252,17 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
   scene.add(group);
 
   const pending = [];
-  const materials = createMaterials({ THREE, renderer, skin, pending });
+  const errors = [];
+  const materials = createMaterials({ THREE, renderer, skin, pending, errors });
   const environment = addEnvironment({ THREE, scene, skin, group });
   const ready = Promise.all(pending);
 
+  // Meshes attach to `parent`, which is the kit group except while building
+  // a module that declares a viewGroup — those collect into a named subgroup
+  // the page can toggle (e.g. a near wall shown only when the camera faces
+  // it, so it frames the scene without ever obstructing the entry approach).
+  let parent = group;
+  const namedGroups = {};
   function box(width, height, depth, material, x, y, z, cast = true) {
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(width, height, depth),
@@ -257,7 +271,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
     mesh.position.set(x, y, z);
     mesh.castShadow = cast;
     mesh.receiveShadow = true;
-    group.add(mesh);
+    parent.add(mesh);
     return mesh;
   }
 
@@ -271,7 +285,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
     mesh.rotation.set(x * 0.17, z * 0.11, (x + z) * 0.07);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    group.add(mesh);
+    parent.add(mesh);
     return mesh;
   }
 
@@ -328,43 +342,49 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
       + (Math.sin(axis * 1.73 + salt) + 1) * 0.14
       + (Math.sin(axis * 3.11 - salt) + 1) * 0.07
     );
-    const far = module.far;
-    let farIndex = 0;
-    for (let x = far.from; x <= far.to; x += far.step) {
-      if (Math.abs(x) < far.gapHalfWidth) continue;
-      const height = wallHeight(x, 0.9);
-      box(
-        far.step * 1.05,
-        height,
-        0.72,
-        farIndex % 3 === 0 ? materials.rockDark : materials.rock,
-        x,
-        height / 2 - 0.03,
-        far.z,
-      );
-      rock(
-        x + Math.sin(x * 2.4) * 0.13,
-        height + 0.08,
-        far.z - 0.03,
-        0.45,
-        0.34 + (farIndex % 2) * 0.07,
-        0.42,
-        farIndex % 4 === 0,
-      );
-      if (farIndex % 3 === 1) {
-        rock(
-          x - 0.22,
-          0.18,
-          far.z + 0.38,
-          0.28,
-          0.2,
-          0.22,
-          true,
+    // far and near are the same run mirrored in z; either (and sides) may be
+    // omitted so one map can split its walls across differently-grouped
+    // modules (the near wall lives in a toggleable viewGroup).
+    for (const run of [module.far, module.near].filter(Boolean)) {
+      const sign = run === module.near ? 1 : -1;   // crest rocks lean outward
+      let farIndex = 0;
+      for (let x = run.from; x <= run.to; x += run.step) {
+        if (run.gapHalfWidth && Math.abs(x) < run.gapHalfWidth) continue;
+        const height = wallHeight(x, 0.9);
+        box(
+          run.step * 1.05,
+          height,
+          0.72,
+          farIndex % 3 === 0 ? materials.rockDark : materials.rock,
+          x,
+          height / 2 - 0.03,
+          run.z,
         );
+        rock(
+          x + Math.sin(x * 2.4) * 0.13,
+          height + 0.08,
+          run.z + sign * 0.03,
+          0.45,
+          0.34 + (farIndex % 2) * 0.07,
+          0.42,
+          farIndex % 4 === 0,
+        );
+        if (farIndex % 3 === 1) {
+          rock(
+            x - 0.22,
+            0.18,
+            run.z - sign * 0.38,
+            0.28,
+            0.2,
+            0.22,
+            true,
+          );
+        }
+        farIndex++;
       }
-      farIndex++;
     }
     const sides = module.sides;
+    if (!sides) return;
     for (const x of sides.x) {
       let sideIndex = 0;
       for (let z = sides.from; z <= sides.to; z += sides.step) {
@@ -411,7 +431,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
       materials.dark,
     );
     shaft.position.set(x, y, z);
-    group.add(shaft);
+    parent.add(shaft);
     for (const postX of module.postX) {
       box(0.3, 2.85, 0.3, materials.timberLight, x + postX, 1.4, module.faceZ);
     }
@@ -428,7 +448,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
       );
       brace.rotation.z = braceX < 0 ? -0.38 : 0.38;
     }
-    for (const [rockX, rockY, sx, sy] of module.crownRocks) {
+    for (const [rockX, rockY, sx, sy] of module.crownRocks || []) {
       rock(x + rockX, rockY, z - 0.19, sx, sy, 0.55);
     }
   }
@@ -446,37 +466,65 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
     }
   }
 
+  // Props are real geometry that OCCUPIES its tile and rotates with the
+  // world — never billboards (Jonah, 2026-07-31: plates read as straddling
+  // squares and turning wrongly). Nicer comes from more parts and the
+  // authored timber grain, not from higher resolution.
   function buildCrate(module) {
     const [x, z] = module.position;
     const size = module.size;
-    const crate = box(size, size, size, materials.timber, x, size / 2, z);
-    for (const dy of [-0.18, 0.18]) {
-      box(
-        size + 0.02,
-        0.06,
-        0.06,
-        materials.iron,
-        x,
-        size / 2 + dy,
-        z - size / 2 - 0.01,
-      );
+    const crate = box(size * 0.94, size, size * 0.94, materials.timber, x, size / 2, z);
+    // corner posts frame the slats
+    const half = size / 2;
+    for (const [dx, dz] of [[-half, -half], [half, -half], [-half, half], [half, half]]) {
+      box(0.07, size + 0.03, 0.07, materials.timberLight, x + dx * 0.94, size / 2, z + dz * 0.94);
+    }
+    // two iron bands wrap the FULL perimeter
+    for (const dy of [-0.16, 0.16]) {
+      const bandY = size / 2 + dy * size;
+      box(size + 0.03, 0.05, size * 0.94, materials.iron, x, bandY, z);
+      box(size * 0.94, 0.05, size + 0.03, materials.iron, x, bandY, z);
     }
     return crate;
   }
 
   function buildOreCart(module) {
     const [x, z] = module.position;
-    const cart = box(1.15, 0.5, 0.78, materials.timberLight, x, 0.43, z);
-    cart.rotation.y = 0.03;
-    for (const dx of [-0.42, 0.42]) {
-      const wheel = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.2, 0.2, 0.11, 14),
-        materials.iron,
-      );
-      wheel.rotation.z = Math.PI / 2;
-      wheel.position.set(x + dx, 0.2, z + 0.43);
-      group.add(wheel);
+    // slatted body: three planks a side with a shadow gap between them
+    const cart = box(0.9, 0.14, 0.6, materials.timber, x, 0.3, z);
+    for (const layer of [0, 1, 2]) {
+      const y = 0.42 + layer * 0.155;
+      box(0.9, 0.13, 0.6 - 0.02 * layer, materials.timberLight, x, y, z);
     }
+    // corner posts and an iron rim
+    for (const [dx, dz] of [[-0.44, -0.29], [0.44, -0.29], [-0.44, 0.29], [0.44, 0.29]]) {
+      box(0.08, 0.55, 0.08, materials.timber, x + dx, 0.5, z + dz);
+    }
+    box(0.96, 0.05, 0.66, materials.iron, x, 0.78, z);
+    // four wheels with hubs, both sides
+    for (const dz of [-0.34, 0.34]) {
+      for (const dx of [-0.28, 0.28]) {
+        const wheel = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.16, 0.16, 0.09, 14),
+          materials.iron,
+        );
+        wheel.rotation.x = Math.PI / 2;
+        wheel.position.set(x + dx, 0.16, z + dz);
+        parent.add(wheel);
+        const hub = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.05, 0.12, 8),
+          materials.rail,
+        );
+        hub.rotation.x = Math.PI / 2;
+        hub.position.set(x + dx, 0.16, z + dz);
+        parent.add(hub);
+      }
+    }
+    // axle beams tie the undercarriage together
+    for (const dx of [-0.28, 0.28]) {
+      box(0.07, 0.07, 0.74, materials.timber, x + dx, 0.16, z);
+    }
+    if (module.empty) return;   // an empty hauler: no ore load above the rim
     for (let index = 0; index < 5; index++) {
       const ore = new THREE.Mesh(
         new THREE.DodecahedronGeometry(0.18 + (index % 2) * 0.05, 0),
@@ -488,7 +536,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
         z,
       );
       ore.rotation.set(index, index * 0.4, 0);
-      group.add(ore);
+      parent.add(ore);
     }
   }
 
@@ -505,7 +553,7 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
         z + index * 0.04,
       );
       crystal.rotation.z = index * 0.41;
-      group.add(crystal);
+      parent.add(crystal);
     }
   }
 
@@ -513,13 +561,13 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
     const [x, y, z] = module.position;
     const lamp = new THREE.PointLight(0xffae56, 8.5, 4.8, 2);
     lamp.position.set(x, y, z);
-    group.add(lamp);
+    parent.add(lamp);
     const cage = new THREE.Mesh(
       new THREE.SphereGeometry(0.12, 10, 7),
       materials.brass,
     );
     cage.position.copy(lamp.position);
-    group.add(cage);
+    parent.add(cage);
   }
 
   const builders = {
@@ -530,15 +578,61 @@ export function buildTerrainKit({ THREE, renderer, scene, map, skin }) {
     "ore-cart": buildOreCart,
     "ore-seam": buildOreSeam,
     "work-lamp": buildWorkLamp,
+    "timber-brace": buildTimberBrace,
   };
-  for (const module of map.modules) builders[module.kind](module);
+  // A wall support: two posts and a cap beam flat against a side wall,
+  // oriented by `along` ('z' for the west/east walls, 'x' for far/near).
+  function buildTimberBrace(module) {
+    const [x, z] = module.position;
+    const alongZ = module.along !== "x";
+    const post = (offset) => box(
+      alongZ ? 0.13 : 0.15,
+      1.72,
+      alongZ ? 0.15 : 0.13,
+      materials.timber,
+      x + (alongZ ? 0 : offset),
+      0.86,
+      z + (alongZ ? offset : 0),
+    );
+    post(-0.52);
+    post(0.52);
+    box(
+      alongZ ? 0.15 : 1.32,
+      0.17,
+      alongZ ? 1.32 : 0.15,
+      materials.timberLight,
+      x,
+      1.78,
+      z,
+    );
+  }
+
+  for (const module of map.modules) {
+    if (module.viewGroup) {
+      if (!namedGroups[module.viewGroup]) {
+        const sub = new THREE.Group();
+        sub.name = `view:${module.viewGroup}`;
+        group.add(sub);
+        namedGroups[module.viewGroup] = sub;
+      }
+      parent = namedGroups[module.viewGroup];
+    } else {
+      parent = group;
+    }
+    builders[module.kind](module);
+  }
+  parent = group;
 
   return {
     group,
     materials,
     environment,
     anchors: map.anchors,
+    /** Subgroups for modules declaring viewGroup; pages may toggle these. */
+    namedGroups,
     ready,
+    /** Texture fetches that failed; populated by the time `ready` settles. */
+    errors,
     box,
     rock,
   };

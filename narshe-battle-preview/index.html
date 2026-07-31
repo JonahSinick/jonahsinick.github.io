@@ -360,6 +360,16 @@
     margin-bottom: 6px; text-align: center; }
   :is(#dlg, #bark) .ln { font-family: var(--dlg); font-size: 22px; line-height: 1.58; font-weight: 400; color: #3b3020; }
   :is(#dlg, #bark) .adv { font-family: var(--ui); font-size: 11.5px; }
+  /* A bark is a bubble over one figure's head; the dialogue bar is furniture at
+     the bottom of the screen. They shared .dpanel's fixed 900px, so a one-word
+     shout laid a slab across two thirds of the view — over, in the gallery's
+     case, the party it was shouted at. WIDTH is the only thing a bark changes:
+     it sizes to what it says. Portrait, type and padding stay exactly as the
+     dialogue panel sets them, so the two read as the same object at the same
+     scale — shrinking those too made the bark look like a lesser panel rather
+     than the same panel, fitted (Jonah, 2026-07-31). This rule comes after
+     every shared one because the specificities tie. */
+  #bark .dpanel { width: max-content; max-width: min(620px, 52vw); }
   .upRole, .fcRole { font-family: var(--ui); letter-spacing: 0.04em; }
   .fcMid .lab { font-family: var(--ui); letter-spacing: 0.14em; }
   .upStatus span { font-family: var(--ui); letter-spacing: 0.06em; }
@@ -560,10 +570,13 @@ import {
   reconstructPath,
 } from './src/core/grid.mjs';
 import { createScheduler } from './src/core/scheduler.mjs';
+import { outcomeOptionsFor, resolveBattle } from './src/content/battles/index.mjs';
 import { warningBellGalleryMap } from './src/content/maps/warning-bell-gallery.mjs';
 import { narsheMineSkin } from './src/content/terrain-skins/narshe-mine.mjs';
 import { buildTerrainKit } from './src/render/terrain-kit.mjs';
+import { createReactionRegistry } from './src/core/reactions.mjs';
 import {
+  applyBerserkState,
   applyDamageState,
   applyHealState,
   applySelfCost,
@@ -592,8 +605,12 @@ const REVIEW_GATE_SKIN = QUERY.get('terrain') !== 'procedural';
 // Review-only second-encounter prototype (Jonah's 2026-07-30 spec in DESIGN.md):
 // the warning-bell gallery with the bonded pair. Opt-in URL, never the default —
 // Battle 1 and its locked balance are untouched without this parameter.
-const WARBELL = QUERY.get('battle') === 'warningbell';
-const W = WARBELL ? 13 : 12, D = WARBELL ? 11 : 18;   // gallery floor vs narrow ravine
+// Which encounter is booting is a lookup against one content record now, not a
+// dozen scattered forks: src/content/battles/ owns the dimensions, entry
+// scene, card title, art set, music, AI zoning and outcome rule.
+const BATTLE_DEF = resolveBattle(QUERY.get('battle'));
+const WARBELL = BATTLE_DEF.id === 'warning-bell';
+const W = BATTLE_DEF.grid.width, D = BATTLE_DEF.grid.depth;   // gallery floor vs narrow ravine
 const TILE = 1;
 const HU = 0.3;               // one height unit
 const ROT_TIME = 0.55;
@@ -1048,6 +1065,7 @@ box(W + 2.4, 0.22, D + 2.4, mat.plinth, W / 2, -0.62, D / 2);
 // its coordinates on the room origin, so the whole group translates to the grid
 // centre and rises until its slab tops meet the engine floor.
 let warbellAnchors = null;
+let wbSouthWall = null;
 let gallerySkinReady = Promise.resolve();
 // Cinematic plates for the bell entrance preload with everything else — the
 // no-cap entry card waits for these too. Failures settle rather than hang.
@@ -1056,16 +1074,21 @@ const wbPlateTex = {};
 if (WARBELL) {
   const plateLoads = [];
   for (const [key, path] of [
+    // The bell is the one plate left here: the sentry became a gait-driven
+    // actor and now draws from the miner set the art pass already loads.
     ['bell', 'art/runtime/review/bonded_defender_cragbeast/warning_bell.png'],
-    ['sentry', 'art/runtime/sprites/miner_front.png'],
-    ['sentryStep', 'art/runtime/sprites/miner_front_walk1.png'],
-    ['sentryStep2', 'art/runtime/sprites/miner_front_walk5.png'],
   ]) {
     plateLoads.push(new Promise(resolve => new THREE.TextureLoader().load(path, tex => {
       tex.colorSpace = THREE.SRGBColorSpace;
       wbPlateTex[key] = tex;
       resolve();
-    }, undefined, () => resolve())));
+    }, undefined, () => {
+      // Settling silently is what let partial art ship unnoticed once already;
+      // the cinematic plates report through the same structured channel as
+      // every other asset (__BATTLE.artErrors()).
+      artLoadErrors.push({ name: 'warbell-plate', pose: key, path, error: 'texture load failed' });
+      resolve();
+    })));
   }
   wbPlatesReady = Promise.all(plateLoads);
 }
@@ -1077,7 +1100,18 @@ if (WARBELL) {
   const slabTop = warningBellGalleryMap.grid.surfaceY + warningBellGalleryMap.grid.slabHeight / 2;
   kit.group.position.set(W / 2, (1 * HU + topThick) - slabTop, D / 2);
   warbellAnchors = kit.anchors || null;
-  gallerySkinReady = kit.ready;      // the entry card holds until the floor is dressed
+  wbSouthWall = (kit.namedGroups && kit.namedGroups.south) || null;
+  if (wbSouthWall) wbSouthWall.visible = false;   // hidden until the camera faces it
+  // the entry card holds until the floor is dressed, and any sheet that failed
+  // to fetch is reported rather than quietly falling back to a bare material
+  gallerySkinReady = kit.ready.then(() => {
+    for (const failure of kit.errors) {
+      artLoadErrors.push({
+        name: 'terrain-kit', pose: failure.texture, path: failure.url,
+        error: 'texture load failed',
+      });
+    }
+  });
 }
 
 // ---------------------------------------------------------------- rugged buildings
@@ -1587,14 +1621,25 @@ const ABIL = {
     tip: 'A grief-note around Seira herself: every enemy within 2 tiles takes ~16. Costs Seira 5 HP. Click again — or click a highlighted tile — to loose it.' },
   flask: { name: 'Poison Flask', cost: 2, range: 4, aim: 'enemy', hl: 'cast',
     tip: 'Poison for 3 turns, 6 damage at the victim’s turn start.' },
+  // Seira's Type-2 kit (warning-bell prototype; numbers provisional). The tip
+  // is a getter because HEAL_AMT is a live tuning knob — a hardcoded number
+  // here told the player 14 while the slider healed something else.
   heal: { name: 'Heal', cost: 1, range: 3, aim: 'ally', hl: 'heal',
-    tip: 'Restore up to 14 HP to an ally or self within 3.' },   // Seira's Type-2 kit (warning-bell prototype; numbers provisional)
+    get tip() { return `Restore up to ${HEAL_AMT} HP to an ally or self within 3.`; } },
 };
 const CRY_DMG = 16, CRY_SELF = 5, CRY_RADIUS = 2, POISON_TURNS = 3, POISON_DMG = 6;
 
 // ---------------------------------------------------------------- tiny tween runner
 const tweens = [];
 function tween(dur, onUpdate, onDone) { tweens.push({ t: 0, dur, onUpdate, onDone }); }
+// Scripted cinematics run on fixed durations, so __BATTLE.fast() used to speed
+// up the simulation and leave the ten-second bell entrance at full length —
+// every automated run of the warning-bell gates paid it in wall time and in
+// flake margin. These two wrappers are the cinematic's clock; gameplay pacing
+// is untouched, so nothing a player sees changes.
+let CINE_SCALE = 1;
+const cineTween = (dur, onUpdate, onDone) => tween(dur * CINE_SCALE, onUpdate, onDone);
+const cineLater = (fn, ms) => later(fn, ms * CINE_SCALE);
 function stepTweens(dt) {
   for (let i = tweens.length - 1; i >= 0; i--) {
     const tw = tweens[i];
@@ -1615,7 +1660,8 @@ function stepOK(x0, z0, x1, z1) {
 }
 function tileCenter(x, z) { return new THREE.Vector3(x + 0.5, tileTop[z][x], z + 0.5); }
 // ranged reach is Chebyshev — a square envelope reads cleanly against the 3×3 burst
-function terraceOf(z) { return WARBELL ? 0 : z >= 14 ? 0 : z >= 10 ? 1 : z >= 6 ? 2 : 3; }   // the gallery is one level: AI may roam it
+// an unzoned battlefield is one level: the AI may roam all of it
+function terraceOf(z) { return !BATTLE_DEF.zonedAi ? 0 : z >= 14 ? 0 : z >= 10 ? 1 : z >= 6 ? 2 : 3; }
 
 // ---------------------------------------------------------------- pixel-art units
 // HD-2D: units are 2D sprites painted one logical pixel at a time and billboarded
@@ -2021,13 +2067,42 @@ for (const view of ART_VIEWS) {
 // Direct mine review only needs the three arriving characters and the view the
 // entrance actually shows. Avoid decoding the entire five-character, 100+ frame
 // battlefield set before the reviewer can see the new scene.
-const ART_LOAD_NAMES = (REVIEW_MINE || WARBELL) ? ['cassien', 'brecht', 'seira'] : ART_NAMES;
+// The gallery's bell sentry is a miner-set cutscene actor whoever is FIELDED,
+// and this file is where he is built, so this file guarantees his plates are
+// in the card's wait. Leaning on the battle descriptor alone made his art a
+// cross-file dependency: a browser holding a cached warning-bell.mjs next to a
+// fresh page would drop 'miner' from the list and drop him back to the
+// procedural placeholder, which is exactly what that looks like on screen.
+const ART_LOAD_NAMES = (REVIEW_MINE ? ['cassien', 'brecht', 'seira']
+                                    : (BATTLE_DEF.artNames || ART_NAMES))
+  .concat(WARBELL ? ['miner'] : [])
+  .filter((name, at, all) => all.indexOf(name) === at);
 const ART_LOAD_POSES = REVIEW_MINE
   ? ['front', 'back', ...Array.from({ length: ART_WALK_MAX }, (_, i) => 'back_walk' + (i + 1))]
   : ART_POSES;
 const ART_RUNTIME_MANIFEST = 'art/runtime/sprites/manifest.json';
 const ART_BY_PAL = { cassien: 'cassien', brecht: 'brecht', seira: 'seira', miner: 'miner', alch: 'alchemist',
                      defender: 'defender', cragbeast: 'cragbeast' };
+// A stress switch is a costume change, so a form has its own plate SET rather
+// than its own frame: the unit is repointed at another entry of `art` and the
+// whole view/gait machinery carries on unchanged against it. Seira's settled
+// Type-2 Helper direction (Jonah, 2026-07-31) is the cool-hood set — a review
+// candidate consumed compact and in place, like the bonded pair, so her
+// accepted Type-4 masters are never touched or shadowed.
+const SEIRA_TYPE2_ART = 'seira_type2';
+// exactly what the set contains: eight-phase front and back, the accepted
+// two-frame side. Listed rather than probed, so a missing plate is an error
+// and not a silently shorter cycle.
+const SEIRA_TYPE2_POSES = ['front', 'back', 'side'].concat(
+  ...['front', 'back'].map(view =>
+    Array.from({ length: 8 }, (_, i) => view + '_walk' + (i + 1))),
+  ['side_walk1', 'side_walk2']);
+// art key -> form number -> the set and dialogue face that form wears. Content,
+// not logic: the switch presentation only asks whether anything was drawn for
+// the form a unit just entered.
+const FORM_ART = { seira: { 2: { art: SEIRA_TYPE2_ART, portrait: SEIRA_TYPE2_ART } } };
+// A unit normally draws from its palette's set; a form switch overrides that.
+function artSetKey(u) { return u.artSet || ART_BY_PAL[u.pal]; }
 // the handoff draws characters filling ~90% of the image height, so a 1.63-unit
 // quad stands them ~1.5 units tall — the same eyeline the pixel sprites hold
 const ART_H = 1.63;
@@ -2072,10 +2147,13 @@ function layoutOverhead(u) {
 // Frames are swapped several times a second during a walk, so the quad is rebuilt
 // only when the new frame is actually a different shape — a walk cycle drawn to
 // the same canvas as its idle costs one map assignment per frame and nothing else.
-function sameQuad(mesh, f) {
+// Compare against the dimensions actually APPLIED, not the unclamped ideal:
+// a plate narrowed to fit its one-tile footprint (Skarn) never matched
+// ART_H * aspect, so the geometry was disposed and rebuilt every walk frame.
+function sameQuad(mesh, f, w = ART_H * f.aspect, h = ART_H) {
   const p = mesh.geometry.parameters;
   return mesh.userData.artFrame &&
-         Math.abs(p.height - ART_H) < 0.002 && Math.abs(p.width - ART_H * f.aspect) < 0.002;
+         Math.abs(p.height - h) < 0.002 && Math.abs(p.width - w) < 0.002;
 }
 function setArtFrame(u, f) {
   const m = u.sprite.material;
@@ -2084,7 +2162,7 @@ function setArtFrame(u, f) {
   // fits its footprint (Skarn's broad silhouette was spilling over neighbors).
   let h = ART_H, w = ART_H * f.aspect;
   if (u.artMaxW && w > u.artMaxW) { h = u.artMaxW / f.aspect; w = u.artMaxW; }
-  if (!sameQuad(u.sprite, f) || Math.abs((u.sprite.userData.artH || 0) - h) > 1e-6) {
+  if (!sameQuad(u.sprite, f, w, h)) {
     u.sprite.geometry.dispose();
     u.sprite.geometry = new THREE.PlaneGeometry(w, h);
   }
@@ -2139,7 +2217,12 @@ function pickView(v, gy, yaw) {
     const d = Math.abs(Math.atan2(Math.sin(rel), Math.cos(rel)));   // 0 = facing the lens
     want = d <= VIEW_FRONT ? 'front' : d >= VIEW_BACK ? 'back' : 'side';
   }
-  return v.art[want] ? want : 'front';                              // undrawn view -> the one file that is required
+  if (v.art[want]) return want;
+  // Undrawn view fallback: a missing BACK prefers the mirrored side profile
+  // over the face-on front — a unit walking away must never appear to spin
+  // toward the lens (Skarn, whose back plate is still queued with Codex).
+  if (want === 'back' && v.art.side) return 'side';
+  return 'front';                                                   // the one file that is required
 }
 function viewNow(v) {
   const yaw = Math.atan2(camera.position.x - v.group.position.x, camera.position.z - v.group.position.z);
@@ -2251,12 +2334,27 @@ function frameKeyFor(v) {
   return v.art[key] ? key : view;
 }
 function useArt(u) {
-  const a = art[ART_BY_PAL[u.pal]];
+  const a = art[artSetKey(u)];
   if (!a || !a.front) return false;
   // choose the plate up front: art lands a second or two after the scene does, and
   // the imperials would otherwise flash their faces before the next frame turns them
   u.art = a; u.artFace = viewNow(u); u.artKey = u.artFace;
   setSpritePose(u, u.downed ? 'down' : 'stand');
+  return true;
+}
+// A form switch repoints the unit at the set drawn for that form and nothing
+// else: view selection, the walk cycles and the frame-count-agnostic gait all
+// read u.art, so the new costume walks on its own frames from the next step —
+// including a set whose side cycle is two frames beside eight-frame front and
+// back. Returns false when no art was drawn for the form, which leaves the
+// unit in the plates it already had rather than blanking it.
+function applyFormArt(u, form) {
+  const entry = (FORM_ART[ART_BY_PAL[u.pal]] || {})[form];
+  if (!entry || !art[entry.art] || !art[entry.art].front) return false;
+  u.artSet = entry.art;
+  useArt(u);
+  if (entry.portrait && portraits[entry.portrait])
+    portraitOverrides[u.name.toLowerCase()] = portraits[entry.portrait];
   return true;
 }
 // portrait ladder: a delivered portraits/<key>.png wins, then a head crop off the
@@ -2426,8 +2524,20 @@ const artReady = (async () => {
         ['defender', 'front', RV + 'defender_type8_aggressive_candidate.png', true],
         ['defender', 'side', RV + 'defender_aggressive_side.png', false],
         ['defender', 'back', RV + 'defender_aggressive_back.png', false],
-        ['cragbeast', 'front', RV + 'cragbeast_front.png', true],
+        // Skarn's front/back are the TRUE ON-AXIS plates (Codex, 9b2d037).
+        // The originals were three-quarter rotations turned toward image-RIGHT,
+        // against the house lean-LEFT convention, so the shared mirror rule
+        // rendered him facing 180 degrees from his logical facing — he read as
+        // staring at Ragna instead of the party. A head-on plate is symmetric
+        // and therefore correct under the mirror either way. Side and the walk
+        // cycles already followed the convention and are unchanged.
+        // The FRONT is the stricter square pass (1702958): the first on-axis
+        // plate killed the 180 error but still read turned on the board —
+        // off-centre brow ridge, unequal horns, side kit showing. Jonah saw it
+        // in play and the art lane had reached the same verdict independently.
+        ['cragbeast', 'front', RV + 'cragbeast_front_onaxis_square_candidate.png', true],
         ['cragbeast', 'side', RV + 'cragbeast_side.png', false],
+        ['cragbeast', 'back', RV + 'cragbeast_back_onaxis_candidate.png', false],
       ];
       for (let i = 1; i <= 2; i++) {
         pairWant.push(['defender', 'front_walk' + i, RV + 'defender_aggressive_front_walk' + i + '.png', false]);
@@ -2437,6 +2547,13 @@ const artReady = (async () => {
         for (let i = 1; i <= ART_WALK_MAX; i++)
           pairWant.push(['cragbeast', view + '_walk' + i, RV + 'cragbeast_' + view + '_walk' + i + '.png', false]);
       await loadBounded(pairWant);
+      // Seira's Type-2 Helper form. Every plate is REQUIRED and loads here,
+      // inside the card's all-art wait: the switch happens mid-battle, so a
+      // lazily fetched costume would pop in after the beat that sells it.
+      const HV = 'art/runtime/review/seira_type2_form/sprites/seira_type2_hood_cool_';
+      const helperWant = SEIRA_TYPE2_POSES.map(pose =>
+        [SEIRA_TYPE2_ART, pose, HV + pose + '.png', true]);
+      await loadBounded(helperWant);
     }
     let any = false;
     for (const u of units) any = useArt(u) || any;
@@ -3573,11 +3690,11 @@ function enterCliffs() {
 // The first visible world matches the entry mode: parameterized entries must
 // never flash the cliffs intro behind the title card before their own scene
 // arrives (Jonah's note) — the splash is translucent for a beat as it lifts.
-if (WARBELL || REVIEW_BATTLE) showScene('town');
+if (BATTLE_DEF.scene === 'town' || REVIEW_BATTLE) showScene('town');
 else if (REVIEW_MINE) showScene('mine');
 else enterCliffs();
 // The card names the place being entered: the gallery battle is in the mines.
-if (WARBELL) document.querySelector('#splash span').textContent = 'NARSHE MINES';
+document.querySelector('#splash span').textContent = BATTLE_DEF.title;
 
 
 function unitAt(x, z) { return units.find(u => u.alive && u.x === x && u.z === z); }
@@ -4046,7 +4163,7 @@ function newRound() {
   // normally cleared deep inside cinematic timer chains; if any chain is
   // ever interrupted, the round boundary restores them so a stuck hold can
   // never silently disable reprisals or music for the rest of the battle.
-  wbHeldReprisals = null;
+  reactions.resume();
   if (musicHeld && wantMusic) cueBattleMusic();
   else musicHeld = false;
   for (const u of units) u.reprisalPending = false;
@@ -4225,6 +4342,25 @@ function heightMod(att, def) {
     LO_MOD,
   );
 }
+// Reactive mechanics are declared by the battle (src/content/battles/), not
+// branched on inside the seam. The registry answers "what does this event
+// provoke, and is it currently held"; these runners are the animated,
+// battle-specific half it deliberately knows nothing about.
+const reactions = createReactionRegistry(BATTLE_DEF.reactions || []);
+const REACTION_RUNNERS = {
+  // each half of the bonded pair answers harm to the OTHER. Only true attacks
+  // with a known attacker provoke it (declared in the descriptor), so a
+  // reprisal can never chain into another reprisal
+  'bond-retaliation': (ev, u) => queueRetaliation(u, ev.sourceId),
+  'berserk-survivor': (ev, u) => berserkSurvivor(u),
+};
+function fireReaction(record, unit) {
+  const run = REACTION_RUNNERS[record.id];
+  if (run) run(record.event, unit);
+}
+function runReactions(event, unit) {
+  for (const record of reactions.provoked(event, unit)) fireReaction(record, unit);
+}
 // Domain transitions in battle-state.mjs own the rules and return serializable
 // events; this is the one seam where presentation reacts to them. Colors and
 // float heights are presentation, so they live here and not in the events.
@@ -4234,10 +4370,7 @@ function presentBattleEvents(events, color) {
     if (!u) continue;
     if (ev.type === 'damageApplied') {
       redrawHp(u);
-      // Warning-bell bond: each half of the pair answers harm to the OTHER.
-      // Only true attacks provoke it; revenge damage carries no source, so a
-      // reprisal can never chain into another reprisal.
-      if (WARBELL && ev.kind === 'attack' && ev.sourceId != null) queueRetaliation(u, ev.sourceId);
+      runReactions(ev, u);
       if (ev.kind === 'self') {          // a paid cost, not a hit: no flash
         floatText('-' + ev.amount, tileCenter(u.x, u.z).add(new THREE.Vector3(0, 1.9, 0)),
           color || '#d39cff');
@@ -4251,25 +4384,25 @@ function presentBattleEvents(events, color) {
       redrawHp(u);
       floatText('+' + ev.amount, tileCenter(u.x, u.z).add(new THREE.Vector3(0, 1.68, 0)), '#b4ffdc');
     } else if (ev.type === 'formChanged') {
-      // Placeholder stress-switch tell: banner, floated label, rose tint on the
-      // sprite (baseColor too, so hit-flashes decay back to the tinted state).
+      // The tell is the costume: the unit changes plates on this beat, and its
+      // dialogue/panel face changes with them. (The rose tint that stood in for
+      // the art is gone — it was a placeholder for exactly this.)
       banner(u.name, u.role);
       floatText('STRESS → ' + u.role, tileCenter(u.x, u.z).add(new THREE.Vector3(0, 2.1, 0)), '#ffb4d0');
-      u.mats.forEach(m => {
-        m.color.setHex(0xffc4d8);
-        m.userData.baseColor = 0xffc4d8;
-      });
+      applyFormArt(u, ev.form);
       renderStrip(); refreshButtons();
     } else if (ev.type === 'unitDowned') {
       if (battle.mark && battle.mark.targetId === u.id) clearMark();
       downUnitView(u);
-      if (WARBELL && (u.cls === 'champion' || u.cls === 'beast')) berserkSurvivor(u);
+      runReactions(ev, u);
       observeOutOfBandFall(u, ev);
     } else if (ev.type === 'unitDefeated') {
       if (battle.mark && (battle.mark.targetId === u.id || battle.mark.casterId === u.id)) clearMark();
       killUnitView(u);
-      if (WARBELL && (u.cls === 'champion' || u.cls === 'beast')) berserkSurvivor(u);
+      runReactions(ev, u);
       observeOutOfBandFall(u, ev);
+    } else if (ev.type === 'berserkApplied') {
+      presentBerserk(u);
     } else if (ev.type === 'tpSpent') {
       renderStrip();
     } else if (ev.type === 'statusAdded' || ev.type === 'statusRemoved') {
@@ -4316,15 +4449,20 @@ function observeOutOfBandFall(u, ev) {
 // its own. Plain timers, not the gameplay scheduler: pure UI ephemera should
 // fade out even across a scene change rather than be orphaned by cancelAll.
 const activeBarks = [];
-function bark(u, text, portraitSrc) {
+function bark(u, text, portraitSrc, holdMs = 3000) {
+  // Structure as markup, but the two variable parts as text: barks are literal
+  // strings today and will be story-driven, and a line of dialogue must never
+  // be able to inject markup into the panel.
   const el = document.createElement('div');
   el.className = 'dpanel';
   el.innerHTML = '<div class="tail up"></div>' +
-    '<div class="dport"><div class="spk caps">' + u.name + '</div>' +
+    '<div class="dport"><div class="spk caps"></div>' +
     '<div class="facecrop">' + (portraitSrc ? '<img alt="" src="' + portraitSrc + '">' : '') + '</div></div>' +
-    '<div class="dmain"><div class="ln">' + text + '</div></div>';
+    '<div class="dmain"><div class="ln"></div></div>';
+  el.querySelector('.spk').textContent = u.name;
+  el.querySelector('.ln').textContent = text;
   document.getElementById('bark').appendChild(el);
-  activeBarks.push({ el, u, until: performance.now() + 3000 });
+  activeBarks.push({ el, u, text, until: performance.now() + holdMs });
   placeBubblePanel(el, u);
 }
 function updateBarks() {
@@ -4341,27 +4479,33 @@ function updateBarks() {
 // atk itself changes), and with SOLO_REVENGE it begins avenging itself the way
 // it avenged its partner — so the endgame never collapses into free hits. The
 // enraged review portraits carry the moment: her grin dies into the snarl.
+// The state change is a domain transition (atk scaling, the stored multiplier)
+// and comes back as a berserkApplied event; everything below the transition is
+// how the moment looks. Routing it through the seam is what keeps the doubled
+// atk explained by an event rather than by an unrecorded write.
 function berserkSurvivor(fallen) {
   const bonded = cls => cls === 'champion' || cls === 'beast';
   const survivor = units.find(v => v.alive && v.id !== fallen.id && bonded(v.cls));
-  if (!survivor || survivor.berserk) return;
-  survivor.berserk = true;
-  survivor.atk = Math.round(survivor.atk * BERSERK_MULT);
-  survivor.ring.material.color.setHex(uiCol(0xff2412));
-  banner(survivor.name, 'BERSERK');
-  floatText('BERSERK', tileCenter(survivor.x, survivor.z).add(new THREE.Vector3(0, 2.05, 0)), '#ff5030');
+  if (!survivor) return;
+  presentBattleEvents(applyBerserkState(survivor, BERSERK_MULT));
+}
+function presentBerserk(u) {
+  u.ring.material.color.setHex(uiCol(0xff2412));
+  banner(u.name, 'BERSERK');
+  floatText('BERSERK', tileCenter(u.x, u.z).add(new THREE.Vector3(0, 2.05, 0)), '#ff5030');
   const RVP = 'art/runtime/review/bonded_defender_cragbeast/portraits/';
-  bark(survivor,
-    survivor.cls === 'champion' ? 'SKARN—! ...All of you. ALL OF YOU.' : 'RRRAAAGH—!',
-    RVP + (survivor.cls === 'champion'
+  bark(u,
+    u.cls === 'champion' ? "SKARN—! ...I'll break every one of you." : 'RRRAAAGH—!',
+    RVP + (u.cls === 'champion'
       ? 'defender_type8_aggressive_enraged_candidate.png'
       : 'cragbeast_enraged_candidate.png'));
   renderStrip();
 }
+// The registry has already decided that this victim's class and this damage
+// kind provoke a reprisal, and whether the moment is suspended; what is left
+// here is who answers and how it looks.
 function queueRetaliation(victim, sourceId) {
   const bonded = cls => cls === 'champion' || cls === 'beast';
-  if (!bonded(victim.cls)) return;
-  if (wbHeldReprisals) { wbHeldReprisals.push([victim, sourceId]); return; }
   let partner = units.find(v => v.alive && v.id !== victim.id && bonded(v.cls));
   if (!partner && SOLO_REVENGE && victim.alive) partner = victim;  // the berserk survivor avenges itself
   const target = unitById(sourceId);
@@ -4377,8 +4521,11 @@ function queueRetaliation(victim, sourceId) {
     const land = () => {
       partner.reprisalPending = false;
       if (!target.alive || phase === 'over') return;   // never land under the outcome overlay
-      // A berserk avenger's grief doubles the reprisal along with its attacks.
-      const dmg = Math.round(REVENGE_DMG * (partner.berserk ? BERSERK_MULT : 1));
+      // A berserk avenger's grief doubles the reprisal along with its attacks,
+      // using the multiplier captured when it went berserk — reading the live
+      // tunable here instead let a mid-battle slider change leave one unit
+      // carrying two different active multipliers.
+      const dmg = Math.round(REVENGE_DMG * (partner.berserk ? partner.berserkMult : 1));
       applyDamage(target, dmg, '#ffa060', null, 'revenge');
       floatText('REVENGE', tileCenter(target.x, target.z).add(new THREE.Vector3(0, 2.05, 0)), '#ffa060');
     };
@@ -4526,8 +4673,7 @@ function castHeal(u, target) {
   completeAction(u);
 }
 // Seira's scripted stress switch (Jonah's spec): Type 4 to Type 2, kit becomes
-// Heal. The rose tint is an explicitly-placeholder tell — real stressed-form
-// art is Codex's lane.
+// Heal. The tell is her Helper plates and portrait, wired 2026-07-31 (FORM_ART).
 function switchSeiraForm(u) {
   presentBattleEvents(switchFormState(u, { form: 2, role: 'Type 2 · Helper', abil: ['heal'] }));
 }
@@ -4577,7 +4723,7 @@ function placeholderFace(cls, accentHex, team) {
   return spriteBust(cls, palKey, team);
 }
 function faceOf(u) {
-  return portraitOf(u.name) || (u.art && artBust(ART_BY_PAL[u.pal], u.team))
+  return portraitOf(u.name) || (u.art && artBust(artSetKey(u), u.team))
     || spriteBust(u.kind, u.pal, u.team);
 }
 
@@ -4640,14 +4786,19 @@ function forecastRevenge(att, tgt) {
   const bonded = cls => cls === 'champion' || cls === 'beast';
   if (!bonded(tgt.cls)) return none;
   const r = fcRange(att, tgt);
-  const base = REVENGE_DMG, hot = Math.round(REVENGE_DMG * BERSERK_MULT);
+  const base = REVENGE_DMG;
+  // An avenger that is ALREADY berserk uses the multiplier it stored when it
+  // turned; one that is about to turn will use the live tunable. Reading the
+  // right one in each case is what keeps the panel honest across a mid-battle
+  // slider change.
+  const hot = a => Math.round(REVENGE_DMG * (a && a.berserk ? a.berserkMult : BERSERK_MULT));
   const partner = units.find(v => v.alive && v.id !== tgt.id && bonded(v.cls));
   if (partner) {
-    if (partner.berserk || r.lo >= tgt.hp) return { lo: hot, hi: hot };
-    return { lo: base, hi: r.hi >= tgt.hp ? hot : base };
+    if (partner.berserk || r.lo >= tgt.hp) return { lo: hot(partner), hi: hot(partner) };
+    return { lo: base, hi: r.hi >= tgt.hp ? hot(partner) : base };
   }
   if (!SOLO_REVENGE || r.lo >= tgt.hp) return none;   // a dead last-survivor avenges nothing
-  const solo = tgt.berserk ? hot : base;
+  const solo = tgt.berserk ? hot(tgt) : base;
   return { lo: r.hi >= tgt.hp ? 0 : solo, hi: solo };
 }
 function showForecast(kind, att, tgt) {
@@ -4887,9 +5038,14 @@ const BASE_PORTRAIT_FRAMES = {
   guard:   { scale: 1, x: 0, y: 0 },
   lenne:   { scale: 1.03, x: 0, y: 1 },
 };
+// speaker key -> portrait url that has replaced this character's face for the
+// rest of the run. A form switch repaints the whole character, dialogue and
+// panel alike, so it belongs above the whole ladder rather than at one rung.
+const portraitOverrides = {};
 // a delivered portrait wins; failing that, a front sprite can supply its own head
 function portraitOf(who) {
   const k = who.toLowerCase();
+  if (portraitOverrides[k]) return portraitOverrides[k];
   if (k === 'lenne' || k === 'girl') return minePortraits.lenne || null;
   if (k === 'ragna') return portraits.ragna || null;
   if (PORTRAIT_KEYS.includes(k)) return portraits[k] || artPortrait(k);
@@ -4987,6 +5143,14 @@ const portraitsReady = (async () => {
       const url = await loadPath('art/runtime/review/bonded_defender_cragbeast/portraits/defender_type8_aggressive_candidate.png');
       if (url) portraits.ragna = url;
     })(),
+    (async () => {
+      // Seira's Helper face, held under its own key until the switch beat
+      // installs it. Loaded with everything else the card waits on, so the
+      // form change never shows the old portrait for a frame.
+      if (!WARBELL) return;
+      const url = await loadPath('art/runtime/review/seira_type2_form/portraits/type2_hood_cool_poc.png');
+      if (url) portraits[SEIRA_TYPE2_ART] = url;
+    })(),
   ]);
   // The suspicious portrait is the accepted baseline Brecht depiction, not a
   // one-line expression variant. It therefore supplies dialogue, forecasts, and
@@ -5052,8 +5216,11 @@ function drawBeat() {
   elDlg.querySelector('.spk').textContent = b.who;
   elDlg.querySelector('.ln').textContent = b.text;
   dlgSpeaker = speakerUnit(b.who);   // camera stays fixed through dialogue — the bubble finds the speaker
-  const variant = dialoguePortraitFor(b);
-  const portraitRule = variant || defaultDialoguePortraitRule(b.who);
+  // Line-specific variants are expressions of a costume this speaker may have
+  // left: once a form switch has repainted her, an acting portrait of the old
+  // form would put it back for one line.
+  const portraitRule = portraitOverrides[String(b.who).toLowerCase()]
+    ? null : (dialoguePortraitFor(b) || defaultDialoguePortraitRule(b.who));
   const minePortraitKey = sceneName === 'mine' && /^(Girl|Lenne)$/.test(b.who)
     ? 'mine:lenne.png' : null;
   dlgPortraitKey = portraitRule ? portraitRule.file : minePortraitKey;
@@ -5159,69 +5326,135 @@ elDlg.addEventListener('pointerdown', ev => {
 // Battle 1: losing any imperial is defeat (all three survive the story).
 // Warning-bell (Jonah, 2026-07-30): FFT-style — only Seira is essential, the
 // battle is lost when SHE falls, however many others do.
+// The rule lives in the battle descriptor, and essential units are named there
+// rather than looked up by hand: the old `units.find(...).id` threw outright on
+// any roster that renamed its protagonist, turning a content typo into an
+// unplayable battle. An unresolvable name is recorded and dropped instead.
+const outcomeErrors = [];
 function outcomeOptions() {
-  if (!WARBELL) return {};
-  const seira = units.find(v => v.name === 'Seira');
-  return { essentialIds: [seira.id], requiredPlayers: 1 };
+  return outcomeOptionsFor(BATTLE_DEF, units, name => {
+    const note = `${BATTLE_DEF.id}: essential unit "${name}" is not on the roster`;
+    if (!outcomeErrors.includes(note)) outcomeErrors.push(note);
+  });
 }
 function checkEnd() {
   const outcome = battleOutcome(units, outcomeOptions());
-  if (outcome === 'victory') { if (WARBELL) warbellVictory(); else victorySequence(); return true; }
+  if (outcome === 'victory') {
+    if (BATTLE_DEF.outcome.victory === 'prototype-card') warbellVictory();
+    else victorySequence();
+    return true;
+  }
   if (outcome === 'defeat') { finish('DEFEAT', true); return true; }
   return false;
 }
 // Scripted opening per Jonah's spec: Seira opens on 3 TP, declares the first
 // move, wades in, and Cries; both bonded enemies answer with fixed revenge;
-// Cassien's rebuke stresses her 4 → 2. EVERY LINE BELOW IS A PLACEHOLDER —
-// Jonah owns the script and will rewrite them; only the beat order is spec.
+// Cassien's rebuke stresses her 4 → 2. The lines below are Jonah-approved as
+// of 2026-07-31 and mirror `story/warning-bell-draft.md` verbatim; edit there
+// first. Beat order is spec — reordering breaks the mechanics it narrates.
 function warbellOpeningBeats() {
   const seira = units.find(v => v.name === 'Seira');
   return [
     { kind: 'fx', skippable: false, run: finish => warbellBellEntrance(finish) },
     { kind: 'line', who: 'Ragna', text: 'Ha! Would you look at that — the Empire feeds us now! Three soldiers, armor and all. Skarn loves the crunchy ones.' },
-    { kind: 'line', who: 'Seira', text: 'I can end this before it becomes a fight.' },
+    { kind: 'line', who: 'Seira', text: 'Let me open. Mournful Cry answers both at once.' },
     { kind: 'line', who: 'Cassien', text: 'Seira, hold position—' },
     { kind: 'fx', skippable: false, run: finish => warbellScriptedCry(seira, finish) },
     { kind: 'line', who: 'Ragna', text: '...You hurt him. You walked into MY mine and you hurt MY beast.' },
     { kind: 'fx', skippable: false, run: finish => warbellReprisalBeat(finish) },
-    { kind: 'line', who: 'Seira', text: 'It... they both answered it. I only made them angrier.' },
-    { kind: 'line', who: 'Cassien', text: 'Look at yourself. The way you meet the world is not working.' },
-    { kind: 'line', who: 'Cassien', text: 'If you want to be helpful, you will need to do something else.' },
+    { kind: 'line', who: 'Seira', text: '...Both of them. At once.' },
+    { kind: 'line', who: 'Cassien', text: 'That was pride, not judgment.' },
+    { kind: 'line', who: 'Cassien', text: "You made yourself the center of this and now you're bleeding for it." },
     { kind: 'fx', skippable: false, run: finish => warbellSwitchBeat(seira, finish) },
-    { kind: 'line', who: 'Seira', text: '...Then I will hold us together instead.' },
+    { kind: 'line', who: 'Seira', text: 'Then it is time for me to focus on helping others.' },
   ];
 }
 // During the scripted cry the reprisals are HELD, so the captain's rage line
 // can land between the hurt and the answer (Jonah's beat order); the next fx
-// beat releases them onto Seira.
-let wbHeldReprisals = null;
+// beat releases them onto Seira. The hold is an explicit call on the registry
+// that owns reactions, not a global the mechanic has to remember to consult —
+// which is what made it possible for a dead timer chain to disable
+// cross-retaliation for the rest of the battle without anything noticing.
+// Ending on (6,4) keeps both bonded enemies inside the self-centred burst,
+// which is what the beat needs mechanically. (The flanking route that walks
+// her AROUND Cassien lives on the `warbell-marching-order` branch, with the
+// staging swap it belongs to.)
+const WB_CRY_PATH = [[6, 7], [6, 6], [6, 5], [6, 4]];
 function warbellScriptedCry(u, finish) {
-  wbHeldReprisals = [];
+  reactions.suspend(['bond-retaliation']);
   centerOn(6, 4, 0.9);
-  moveUnit(u, [[6, 7], [6, 6], [6, 5], [6, 4]], () => {
-    castCry(u, () => later(finish, 600));
+  moveUnit(u, WB_CRY_PATH, () => {
+    castCry(u, () => cineLater(finish, 600));
   });
 }
-// ---- bell entrance (Jonah's staging, unlocked by the captain's plates): a
-// sentry spots the party, runs to the warning bell, rings it, and flees into
-// the dark; only then do Ragna and Skarn walk out of the shaft together — the
-// pair entering as one is the visual statement of the bond the retaliation
-// rules then teach.
+// ---- bell entrance (Jonah's staging, unlocked by the captain's plates): the
+// imperial trio walks in through the south doorway, a sentry watching from up
+// the gallery calls it, runs to the warning bell, rings it, and flees into the
+// dark; only then do Ragna and Skarn walk out of the shaft together — the pair
+// entering as one is the visual statement of the bond the retaliation rules
+// then teach.
+// The party's march in: [name, seconds of walk, ms of head start, stride
+// offset in cycles]. Seira leads — she is both the eager one and the deepest
+// staging tile, so she has the furthest to come.
+// (Jonah asked on 2026-07-31 for CASSIEN to lead with Seira behind him. That
+// change is real and staged on the `warbell-marching-order` branch; it is not
+// here because it flips the warbell-kit doctrine gate from a round-6 win to a
+// loss, and the resolution is a balance decision. See HANDOFF_PROJECT.md.)
+// Column-order only (Jonah, 2026-07-31): CASSIEN steps out of the fog first
+// and leads the column; everyone keeps their original staging tiles, so the
+// balance-relevant positions — and the doctrine gates — are untouched. The
+// full position swap remains staged on `warbell-marching-order` as a
+// possible post-playtest tuning decision.
+const WB_PARTY_MARCH = [
+  ['Cassien', 1.05, 0, 0.31],
+  ['Seira', 1.55, 260, 0],
+  ['Brecht', 1.05, 500, 0.63],
+];
+// A world z past the south wall line (the floor's last row is z 10), so they
+// come out of the fog rather than fading up in the middle of the room. The
+// south wall group itself is hidden at the default camera; the doorway they
+// use is where it stands.
+const WB_DOOR_Z = 10.9;
+// Far enough up the gallery that the sentry's bark bubble clears the party.
+const WB_SENTRY_POST = [4.2, 4.4];
+// The entry card fades over SPLASH_FADE. The scripted beat starts under it, so
+// without this the march was most of the way done by the time the curtain was
+// off the screen. The camera opens on an empty gallery first, and THEN the
+// party comes through the door.
+const WB_CURTAIN_HOLD = 1250;
+// The gallery holds still after they arrive, before anyone speaks.
+const WB_ARRIVAL_HOLD = 1100;
+// The entry frame sits south of the gallery midpoint so the doorway the party
+// comes through is on screen; the camera cranes up to the bell for the sentry.
+const WB_ENTRY_CENTER_Z = 7.2;
+// World height of the bell plate. Named because the mount pivot below does
+// arithmetic with it.
+const WB_BELL_H = 1.15;
 // The gallery floor is flat, so cinematic props may sit at fractional grid
 // coordinates: height comes from one known-good tile, never from indexing
 // tileTop with a fraction.
 function wbFloorPos(x, z) {
   return new THREE.Vector3(x + 0.5, tileTop[2][6], z + 0.5);
 }
-function wbCineBillboard(texKey, height, x, z) {
+// `pivot: 'top'` hangs the plate from its own top edge instead of balancing it
+// on its middle. A mesh rotates about its geometry's origin, so a plate whose
+// geometry is centred swings like a propeller — the mount travels as far as the
+// thing it is holding. Sliding the geometry down inside the mesh by half its
+// height puts the origin ON the top edge, and a rotation then reads as the
+// bracket staying planted while the body swings beneath it (Jonah, 2026-07-31).
+function wbCineBillboard(texKey, height, x, z, pivot = 'center') {
   const tex = wbPlateTex[texKey];
   const aspect = tex && tex.image ? tex.image.width / tex.image.height : 0.6;
   const material = new THREE.MeshBasicMaterial({
     map: tex || null, transparent: true, alphaTest: 0.08,
     side: THREE.DoubleSide, toneMapped: false, fog: true,
   });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(height * aspect, height), material);
-  mesh.position.y = height / 2;
+  const geometry = new THREE.PlaneGeometry(height * aspect, height);
+  if (pivot === 'top') geometry.translate(0, -height / 2, 0);
+  const mesh = new THREE.Mesh(geometry, material);
+  // either way the plate's BOTTOM lands on the group origin; only what
+  // mesh.position.y names changes — the middle, or the mount.
+  mesh.position.y = pivot === 'top' ? height : height / 2;
   const group = new THREE.Group();
   group.add(mesh);
   group.position.copy(wbFloorPos(x, z));
@@ -5231,12 +5464,70 @@ function wbCineBillboard(texKey, height, x, z) {
   return b;
 }
 const wbCineBillboards = [];
+// Gallery props are kit geometry again (Jonah, 2026-07-31): billboard
+// plates read as straddling squares and turning wrongly for scenery. The
+// authored plates stay archived under art/review/narshe-mine-props/.
+// The bell is the only plate left, and it hangs for the whole battle, so the
+// retire path lives with the actors below — a figure that leaves the scene is
+// now a figure, not a plate.
+// ---- gallery cutscene actors: the cliffs/mine figure, standing on the battle
+// floor. A figure that CROSSES the gallery is one of these rather than a slid
+// plate, so the engine's distance-synced gait carries it — two strides per
+// tile off its own travel, the view its heading calls for — instead of a
+// texture flip pretending underneath a glide.
+const wbCineActors = [];
+function addWarbellActor(name, kind, pal, x, z) {
+  const { group: fig, mats, mesh } = spriteFigure(kind, pal);
+  const group = new THREE.Group();
+  group.add(fig);
+  group.position.copy(wbFloorPos(x, z));
+  world.add(group);
+  const a = { name, kind, pal, team: 'player', group, fig, sprite: mesh, mats,
+              flip: 1, art: null, artFace: 'front', artKey: 'front',
+              walking: false, walkT: 0, walkDist: 0,
+              lastX: group.position.x, lastZ: group.position.z,
+              cutscene: true, topY: ART_H };   // scripted staging: gait is unconditional
+  a.setFrame = f => actorSetFrame(a, f);
+  // Runs after the card's all-art wait, so the painted set is already in. If it
+  // somehow is not, say so through the same channel every other asset uses:
+  // falling back to the procedural figure SILENTLY is how a pixelated stand-in
+  // ships looking like a finished shot.
+  if (!useActorArt(a)) {
+    artLoadErrors.push({ name: pal, pose: 'front', path: 'art/runtime/sprites/' + pal + '_front.png',
+                         error: 'cutscene actor "' + name + '" fell back to the procedural figure' });
+  }
+  wbCineActors.push(a);
+  return a;
+}
+// Point a cutscene actor along its own travel; the view selection then decides
+// which plate that heading calls for, exactly as it does for a battle unit.
+function wbFaceAlong(a, dx, dz) {
+  if (dx || dz) a.group.rotation.y = Math.atan2(dx, dz);
+}
+// An actor that has left the scene must also leave the per-frame billboard
+// list and give its geometry/material back. Its TEXTURES are not its own —
+// they are the shared painted set every miner draws from — so they stay.
+function wbRetireActor(a) {
+  const at = wbCineActors.indexOf(a);
+  if (at >= 0) wbCineActors.splice(at, 1);
+  world.remove(a.group);
+  a.sprite.geometry.dispose();
+  for (const m of a.mats) m.dispose();
+}
 function warbellBellEntrance(finish) {
   const gx = k => k + W / 2, gz = k => k + D / 2;      // kit-local anchor -> grid
   const bellA = (warbellAnchors && warbellAnchors.warningBell) || [2.28, 1.22, -5.13];
-  const bell = wbCineBillboard('bell', 1.15, gx(bellA[0]) - 0.5, gz(bellA[2]) - 0.5);
-  bell.mesh.position.y = (bellA[1] || 1.22) + 0.35;     // hangs from the shaft frame, not floor-standing
-  const sentry = wbCineBillboard('sentry', 1.5, 4.6, 7.2);
+  const bell = wbCineBillboard('bell', WB_BELL_H, gx(bellA[0]) - 0.5, gz(bellA[2]) - 0.5, 'top');
+  // hangs from the shaft frame, not floor-standing. With the top-edge pivot
+  // this y names the MOUNT, so it carries half a plate more than the old
+  // centre-pivot number to leave the bell body hanging exactly where it was.
+  bell.mesh.position.y = (bellA[1] || 1.22) + 0.35 + WB_BELL_H / 2;
+  // kind/pal match the fielded militia (MINER): 'archer' is the procedural
+  // fallback shape, 'miner' the palette AND the painted set he actually uses.
+  // He stands well up the gallery, away from the party's staging: his bark
+  // bubble hangs over his own head, and down at the south end it covered the
+  // very arrival it is reacting to (Jonah, 2026-07-31).
+  const sentry = addWarbellActor('Sentry', 'archer', 'miner', WB_SENTRY_POST[0], WB_SENTRY_POST[1]);
   const ragna = units.find(v => v.name === 'Ragna');
   const skarn = units.find(v => v.name === 'Skarn');
   // the pair is UNSEEN in the dark of the shaft until the bell has spoken
@@ -5246,76 +5537,133 @@ function warbellBellEntrance(finish) {
     u.group.visible = false;
     u.cutscene = true;                                  // unconditional gait for the entrance
   }
-  centerOn(Math.round(gx(bellA[0]) - 1.5), Math.max(1, Math.round(gz(bellA[2]) + 2.6)), 1.0);
-  floatText('!', sentry.group.position.clone().add(new THREE.Vector3(0, 1.9, 0)), '#ffe08a');
-  const stepTex = [wbPlateTex.sentryStep, wbPlateTex.sentryStep2].filter(Boolean);
-  let stepFlip = null;
-  const sentrySlide = (to, dur, done) => {
+  // The trio ARRIVES rather than already standing there (Jonah, 2026-07-31):
+  // it starts past the south wall line, in the fog outside the doorway, and
+  // walks up to its staging tiles on the real gait. Staggered starts and
+  // per-figure stride offsets keep it from reading as one soldier drawn three
+  // times, the same trick the cliffs march uses.
+  // A name that is not on the roster is dropped rather than thrown on: a
+  // renamed or re-cast party must not take the opening beat down with it, and
+  // whoever is missing simply starts on their tile.
+  const marchers = WB_PARTY_MARCH.map(([name, dur, delay, offset]) => {
+    const u = units.find(v => v.name === name);
+    if (!u) return null;
+    const home = { x: u.x, z: u.z };
+    u.cutscene = true;                                  // unconditional gait for the entrance
+    u.gaitOffset = offset;
+    u.group.position.copy(wbFloorPos(u.x, WB_DOOR_Z));
+    u.group.visible = false;
+    return { u, home, dur, delay };
+  }).filter(Boolean);
+  const marchIn = done => {
+    if (!marchers.length) { done(); return; }
+    let landed = 0;
+    for (const m of marchers) cineLater(() => {
+      m.u.group.visible = true;
+      const from = m.u.group.position.clone();
+      const to = tileCenter(m.home.x, m.home.z);
+      wbFaceAlong(m.u, to.x - from.x, to.z - from.z);
+      setWalking(m.u, true);
+      cineTween(m.dur, p => m.u.group.position.lerpVectors(from, to, p), () => {
+        setWalking(m.u, false);
+        m.u.group.position.copy(to);
+        m.u.cutscene = false;
+        faceToward(m.u, m.home.x, 0);                   // they arrive looking up the gallery
+        if (++landed === marchers.length) done();
+      });
+    }, m.delay);
+  };
+  // He crosses on his own feet: the gait is driven by the ground he covers, so
+  // the stride stays in step with the tween at any march speed, and the plate
+  // is whichever view his heading calls for rather than a fixed front.
+  const sentryWalk = (to, dur, done) => {
     const from = sentry.group.position.clone();
-    let step = 0;
-    if (stepTex.length && !stepFlip) stepFlip = setInterval(() => {
-      sentry.material.map = stepTex[step++ % stepTex.length];
-      sentry.material.needsUpdate = true;
-    }, 150);
-    tween(dur, p => sentry.group.position.lerpVectors(from, to, p), () => {
-      if (stepFlip) { clearInterval(stepFlip); stepFlip = null; }
-      sentry.material.map = wbPlateTex.sentry || null;
-      sentry.material.needsUpdate = true;
+    wbFaceAlong(sentry, to.x - from.x, to.z - from.z);
+    setWalking(sentry, true);
+    cineTween(dur, p => sentry.group.position.lerpVectors(from, to, p), () => {
+      setWalking(sentry, false);
       done();
     });
   };
-  sentrySlide(bell.group.position.clone().add(new THREE.Vector3(0.7, 0, 0.4)), 1.35, () => {
-    // three swings, three CLANGs — the encounter's namesake earns its title card
-    let swings = 0;
-    const swing = () => {
-      chimeBell();
-      floatText('CLANG!', bell.group.position.clone().add(new THREE.Vector3(0, 1.7, 0)), '#ffd79a');
-      tween(0.42, p => { bell.mesh.rotation.z = Math.sin(p * Math.PI * 2) * 0.28; }, () => {
-        bell.mesh.rotation.z = 0;
-        if (++swings < 3) swing();
-        else later(() => {
-          // the sentry bolts INTO the shaft — he is running to FETCH the
-          // rescue crew, and out of that same darkness they will come
-          sentrySlide(wbFloorPos(6.0, -0.4), 0.85, () => { world.remove(sentry.group); });
-          tween(0.85, p => { sentry.material.opacity = 1 - Math.max(0, (p - 0.55) / 0.45); });
-          sentry.material.transparent = true;
-          later(pairEntrance, 1050);
-        }, 420);
-      });
-    };
-    later(swing, 200);
-  });
+  // Order is the point of the staging: they walk in, the gallery holds still
+  // long enough to register that someone has arrived, and only THEN does the
+  // sentry speak — his "Intruders!" is a reaction to what he has just watched,
+  // not a line that opens the scene.
+  cineLater(() => marchIn(() => cineLater(() => {
+    centerOn(Math.round(gx(bellA[0]) - 1.5), Math.max(1, Math.round(gz(bellA[2]) + 2.6)), 1.0);
+    // "Intruders!" is Jonah's line (2026-07-31) — the sentry names the threat,
+    // PLANTED; the bubble finishes fading BEFORE his feet move.
+    // The face is the painted militia portrait every other speaking townsman
+    // uses — same wool cap, red scarf and pit-lamp this sentry wears. It was
+    // pointed at his FIELD SPRITE, so the one bubble in the scene held a
+    // shrunken battlefield figure where every other panel holds a portrait.
+    bark({ name: 'Sentry', group: sentry.group, topY: sentry.topY }, 'Intruders!',
+      portraitOf('guard'), 1600);
+    runToBell();
+  }, WB_ARRIVAL_HOLD)), WB_CURTAIN_HOLD);
+  function runToBell() {
+    cineLater(() => sentryWalk(bell.group.position.clone().add(new THREE.Vector3(0.7, 0, 0.4)), 1.35, () => {
+      // three swings, three chimes — the encounter's namesake earns its title
+      // card. The bell is HEARD, not captioned: the synthesized chime and the
+      // swinging plate carry it, and the floated "CLANG!" that used to spell it
+      // out is gone (Jonah, 2026-07-31).
+      let swings = 0;
+      const swing = () => {
+        chimeBell();
+        cineTween(0.42, p => { bell.mesh.rotation.z = Math.sin(p * Math.PI * 2) * 0.28; }, () => {
+          bell.mesh.rotation.z = 0;
+          if (++swings < 3) swing();
+          else cineLater(() => {
+            // the sentry bolts INTO the shaft — he is running to FETCH the
+            // rescue crew, and out of that same darkness they will come
+            sentryWalk(wbFloorPos(6.0, -0.4), 0.85, () => wbRetireActor(sentry));
+            // He keeps walking while he fades, so the opacity is re-applied every
+            // frame: each new gait frame resets the material the walk cycle set.
+            // alphaTest has to come down with it or the figure would pop out at
+            // the cutoff instead of thinning into the dark.
+            cineTween(0.85, p => {
+              const o = 1 - Math.max(0, (p - 0.55) / 0.45);
+              for (const m of sentry.mats) {
+                m.transparent = true; m.opacity = o; m.alphaTest = Math.min(0.4, o * 0.4);
+              }
+            });
+            cineLater(pairEntrance, 1050);
+          }, 420);
+        });
+      };
+      cineLater(swing, 200);
+    }), 2100);   // bark holds 1600ms + 300ms fade + a breath, THEN he runs
+  }
   function pairEntrance(){
     centerOn(6, 3, 1.05);
     ragna.group.visible = true;
     skarn.group.visible = true;
     moveUnit(ragna, [[6, 1], [6, 2]], () => { ragna.cutscene = false; faceToward(ragna, 6, 9); });
-    later(() => moveUnit(skarn, [[7, 1], [7, 2]], () => {
+    cineLater(() => moveUnit(skarn, [[7, 1], [7, 2]], () => {
       skarn.cutscene = false; faceToward(skarn, 7, 9);
       cueBattleMusic();                    // Hoof and Horn lands with the pair on the field
-      later(finish, 550);
+      cineLater(finish, 550);
     }), 380);
   }
 }
 function warbellReprisalBeat(finish) {
-  const held = wbHeldReprisals || [];
-  wbHeldReprisals = null;
+  const held = reactions.resume();
   const seira = units.find(v => v.name === 'Seira');
   const expected = seira.hp - held.length * REVENGE_DMG;
-  for (const [victim, sourceId] of held) queueRetaliation(victim, sourceId);
+  for (const record of held) fireReaction(record, unitById(record.unitId));
   // Hand the beat back when the stones have actually landed — their rAF
   // flight time varies wildly with machine load, so a fixed hold either
   // drags the scene or cuts it — with a hard cap as the backstop.
   const t0 = performance.now();
   const settled = () => {
-    if (seira.hp <= expected || performance.now() - t0 > 6000) { later(finish, 400); return; }
-    later(settled, 150);
+    if (seira.hp <= expected || performance.now() - t0 > 6000) { cineLater(finish, 400); return; }
+    later(settled, 150);   // the 6s cap is a machine-load backstop and never scales
   };
   settled();
 }
 function warbellSwitchBeat(u, finish) {
   switchSeiraForm(u);
-  later(finish, 900);
+  cineLater(finish, 900);
 }
 // The prototype ends on a plain card: Battle 1's victory staging (post-battle
 // script, mine transition) belongs to Part I and never runs here.
@@ -5817,7 +6165,7 @@ addEventListener('blur', () => exploreKeys.clear());
 const AUDIO_VER = 3;
 // The warning-bell battle prefers its own track the moment one lands in
 // audio/ (Jonah has one made for it); until then it falls back to battle1.
-const AUDIO_CANDIDATES = (WARBELL ? ['mp3', 'ogg'].map(ext => `audio/warningbell.${ext}`) : [])
+const AUDIO_CANDIDATES = BATTLE_DEF.music
   .concat(['audio/battle1.mp3'])
   .concat(['A', 'B', 'C'].flatMap(k => ['ogg', 'mp3'].map(ext => `audio/battle1_candidate${k}.${ext}`)));
 const audioBtn = document.getElementById('audioBtn');
@@ -5843,7 +6191,7 @@ const musicReady = (async () => {
 // bell and the sentry play against silence, and Hoof and Horn lands with
 // Ragna's entrance (Jonah). The splash gesture still resumes the context, so
 // the deferred start needs no further user action.
-let musicHeld = WARBELL;
+let musicHeld = BATTLE_DEF.holdMusic;
 function cueBattleMusic() { musicHeld = false; startMusic(); }
 // A cast-bell strike, synthesized: a handful of inharmonic partials with
 // exponential decay. No audio asset exists or is needed for this.
@@ -6061,6 +6409,8 @@ function updateGame(dt, t) {
     if (!v.sprite || !v.group.parent) continue;
     billboard(v, dt, v.alive);
   }
+  // gallery cutscene actors billboard by the unit rules, gait and all
+  for (const a of wbCineActors) billboard(a, dt, true);
   // the cliffs figures billboard by the same rules, minus everything unit-shaped
   if (cliffsWorld.visible) for (const a of cliffActors) billboard(a, dt, true);
   if (mineWorld.visible) {
@@ -6104,6 +6454,13 @@ function updateGame(dt, t) {
     markMesh.rotation.y = t * 1.6;
   }
   updateBarks();
+  // The near wall exists only when the camera swings to face it: shown once
+  // the lens is clearly north of the gallery centre (looking back south at
+  // it), hidden through the boundary band so orbiting never flickers it.
+  if (wbSouthWall) {
+    if (camera.position.z < D / 2 - 1.5) wbSouthWall.visible = true;
+    else if (camera.position.z > D / 2 + 0.5) wbSouthWall.visible = false;
+  }
   // cinematic plates read flat unless they face the lens like every unit does
   for (const b of wbCineBillboards) {
     if (!b.group.parent) continue;
@@ -6131,6 +6488,13 @@ function updateGame(dt, t) {
 window.__BATTLE = {
   units, tileTop, camera, scene, THREE, marker, ABIL, composer, bloom, bokeh,
   timers: () => runtimeTimers.state(),
+  // which encounter booted, and anything its descriptor could not resolve
+  battle: () => ({
+    id: BATTLE_DEF.id, title: BATTLE_DEF.title,
+    grid: { ...BATTLE_DEF.grid }, scene: BATTLE_DEF.scene,
+    zonedAi: BATTLE_DEF.zonedAi, outcome: { ...BATTLE_DEF.outcome },
+    errors: outcomeErrors.slice(),
+  }),
   story: () => ({
     source: storyStatus.source,
     directives: storyStatus.directives.slice(),
@@ -6156,7 +6520,7 @@ window.__BATTLE = {
       fog: !!hlMat[k].fog, toneMapped: !!hlMat[k].toneMapped, opacity: hlMat[k].opacity });
     return out;
   },
-  fast: () => { AI_BEAT = 30; STEP_TIME = 0.02; FAST_SIM = true; },
+  fast: () => { AI_BEAT = 30; STEP_TIME = 0.02; FAST_SIM = true; CINE_SCALE = 0.12; },
   rotate: dir => { rotate(dir); return azTarget; },   // same 90° step the Q/E keys take
   // off-lattice camera angles, which the player's 90° steps cannot reach: the
   // cutscene uses them, and a test needs them to hold a unit in profile
@@ -6297,18 +6661,28 @@ window.__BATTLE = {
       mark: battle.mark && { caster: unitById(battle.mark.casterId).name,
                              target: unitById(battle.mark.targetId).name, turns: battle.mark.turns },
       warbell: WARBELL ? { revenge: REVENGE_DMG, heal: HEAL_AMT,
-                           berserk: BERSERK_MULT, soloRevenge: SOLO_REVENGE } : null,
-      music: { loaded: !!musicBuf, started: musicStarted, muted, url: musicUrl, ver: AUDIO_VER,
+                           berserk: BERSERK_MULT, soloRevenge: SOLO_REVENGE,
+                           // null once the opening releases them; a number here
+                           // after the handover means reprisals are stuck held
+                           heldReprisals: reactions.suspended ? reactions.pending : null } : null,
+      music: { loaded: !!musicBuf, started: musicStarted, muted, held: musicHeld, url: musicUrl, ver: AUDIO_VER,
                context: actx ? actx.state : null,
                seconds: musicBuf ? +musicBuf.duration.toFixed(1) : 0 },
     };
   },
   roster: () => units.map(u => ({
     id: u.id, name: u.name, team: u.team, cls: u.cls, x: u.x, z: u.z,
-    hp: u.hp, maxHp: u.maxHp, tp: u.tp, alive: u.alive, downed: u.downed,
-    aimed: u.aimed, reach: shotRange(u), atk: u.atk, poison: u.poison, defending: u.defending,
-    form: u.form, abil: [...u.abil],
+    hp: u.hp, maxHp: u.maxHp, tp: u.tp, alive: u.alive, downed: u.downed, downable: !!u.downable,
+    aimed: u.aimed, reach: shotRange(u), atk: u.atk, move: u.move, poison: u.poison,
+    defending: u.defending, form: u.form, abil: [...u.abil],
+    // reaction/cutscene state the warning-bell gates assert against: a bot
+    // cannot otherwise tell a doubled atk from a retuned one, or a live unit
+    // from one the entrance still owns
+    berserk: !!u.berserk, cutscene: !!u.cutscene,
   })),
+  // active battle barks, so a gate can assert the encounter SAID something
+  // rather than only that the numbers moved
+  barks: () => activeBarks.map(b => ({ name: b.u.name, text: b.text })),
   // which of the current unit's abilities are affordable and legal right now
   abils: () => { const u = current(); return u && phase === 'player' ? u.abil.filter(k => canCast(u, k)) : []; },
   highlights: () => hlActive.map(m => m.userData.tile),
@@ -6498,6 +6872,8 @@ window.__BATTLE = {
         townBasinY: TOWN_BASIN_Y,
       },
       units: units.map(row), actors: cliffActors.map(row),
+      // the gallery's own cutscene figures (the bell sentry), while they exist
+      galleryActors: wbCineActors.map(row),
       exit: cliffExit ? { t: +cliffExit.t.toFixed(3), maxDistance: CLIFF_EXIT_MAX } : null,
       exitCompletedOffscreen: cliffExitCompletedOffscreen,
     };
@@ -6524,7 +6900,7 @@ window.__BATTLE = {
   },
   // character-art inspection: which units picked up delivered art, and how it sits
   artReady, art: () => units.map(u => ({
-    id: u.id, name: u.name, key: ART_BY_PAL[u.pal],
+    id: u.id, name: u.name, key: artSetKey(u),
     frames: u.art ? Object.keys(u.art) : [], face: u.artFace, frameKey: u.artKey, downed: u.downed,
     topY: +u.topY.toFixed(3), tilt: +u.sprite.rotation.x.toFixed(3),
     quad: [+u.sprite.geometry.parameters.width.toFixed(3), +u.sprite.geometry.parameters.height.toFixed(3)],
@@ -6742,9 +7118,18 @@ let splashDone = () => {
     // the camera to the gallery midpoint NOW — this runs under the opaque
     // card, so the reveal is already composed and the first beat glides
     // from a sensible frame instead of cutting.
+    // enterTown() ends on Battle 1's slow push-in from the wide boot framing.
+    // The gallery does not want it: the trio's arrival march is the first
+    // thing that happens here, and it was playing inside a three-second zoom,
+    // at a fraction of the scale it is staged for. Land the composed shot
+    // instead, the way frameConfrontation(true) does for the review entry.
     enterTown();
-    CENTER.set(6.5, 1.2, 6.0);
+    glide = null; zoomAnim = null;
+    CENTER.set(6.5, 1.2, WB_ENTRY_CENTER_Z);
     clampCenter();
+    camera.zoom = OPEN_ZOOM;
+    camera.updateProjectionMatrix();
+    placeCamera();
     startDialogue(warbellOpeningBeats(), newRound);
     openResolve();
     return;

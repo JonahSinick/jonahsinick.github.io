@@ -15,6 +15,7 @@ export const UNIT_DOMAIN_FIELDS = [
   'x', 'z', 'hp', 'maxHp', 'atk', 'move', 'speed', 'range', 'abil',
   'alive', 'downed', 'downable', 'defending',
   'tp', 'moved', 'acted', 'aimed', 'poison', 'form',
+  'berserk', 'berserkMult',
 ];
 
 export function createUnitState({
@@ -40,7 +41,31 @@ export function createUnitState({
     x, z, hp, maxHp, atk, move, speed, range, abil,
     alive: true, downed: false, downable, defending: false,
     tp: 0, moved: false, acted: false, aimed: false, poison: 0, form,
+    berserk: false, berserkMult: null,
   };
+}
+
+/**
+ * Grief scaling: a unit whose bond partner has fallen hits harder from that
+ * point on, and any fixed reaction damage it owns scales with it.
+ *
+ * The multiplier is STORED rather than read live at each use. Attack scaling
+ * is applied once, at the moment of the fall, while reaction damage is
+ * computed later when it fires; reading a tunable global at both moments let a
+ * mid-battle tuning change produce two different active multipliers on the
+ * same unit. Storing it also makes the doubled atk explainable on replay:
+ * the event says what it was multiplied by and from what, so a restored save
+ * cannot double-apply it.
+ */
+export function applyBerserkState(unit, multiplier) {
+  if (!unit.alive || unit.berserk) return [];
+  const atkFrom = unit.atk;
+  unit.berserk = true;
+  unit.berserkMult = multiplier;
+  unit.atk = Math.round(atkFrom * multiplier);
+  return [{
+    type: 'berserkApplied', unitId: unit.id, multiplier, atkFrom, atkTo: unit.atk,
+  }];
 }
 
 /** Plain domain snapshot of a unit that may also carry presentation fields. */
