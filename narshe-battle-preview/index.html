@@ -4042,6 +4042,14 @@ function clearMark() { presentBattleEvents(clearMarkState(battle)); }
 
 function newRound() {
   round++;
+  // Defensive latch releases (2026-07-31 review): these one-way flags are
+  // normally cleared deep inside cinematic timer chains; if any chain is
+  // ever interrupted, the round boundary restores them so a stuck hold can
+  // never silently disable reprisals or music for the rest of the battle.
+  wbHeldReprisals = null;
+  if (musicHeld && wantMusic) cueBattleMusic();
+  else musicHeld = false;
+  for (const u of units) u.reprisalPending = false;
   queue = units.filter(u => u.alive).sort((a, b) => b.speed - a.speed || a.team.localeCompare(b.team) || a.id - b.id);
   qi = -1;
   nextTurn();
@@ -4256,9 +4264,12 @@ function presentBattleEvents(events, color) {
       if (battle.mark && battle.mark.targetId === u.id) clearMark();
       downUnitView(u);
       if (WARBELL && (u.cls === 'champion' || u.cls === 'beast')) berserkSurvivor(u);
+      observeOutOfBandFall(u, ev);
     } else if (ev.type === 'unitDefeated') {
+      if (battle.mark && (battle.mark.targetId === u.id || battle.mark.casterId === u.id)) clearMark();
       killUnitView(u);
       if (WARBELL && (u.cls === 'champion' || u.cls === 'beast')) berserkSurvivor(u);
+      observeOutOfBandFall(u, ev);
     } else if (ev.type === 'tpSpent') {
       renderStrip();
     } else if (ev.type === 'statusAdded' || ev.type === 'statusRemoved') {
@@ -4280,6 +4291,20 @@ function presentBattleEvents(events, color) {
 }
 function applyDamage(def, dmg, color, sourceId = null, kind = 'attack') {
   presentBattleEvents(applyDamageState(def, dmg, kind, sourceId), color);
+}
+// Reprisal damage is the game's first that lands OUTSIDE the turn flow (a
+// delayed flight after the attacker's action already completed). The turn
+// engine only checks endings at nextTurn, so an out-of-band kill used to
+// leave a dead unit holding a live turn — current() returns null for the
+// dead, every button gates on it, and the battle soft-locks; a reprisal
+// felling Seira also left the defeat unobserved. The seam itself now
+// watches: only 'revenge'-kind falls route here, because in-band damage
+// (attacks, poison, cry) already has its ending handled by the turn flow
+// and a second endTurn would double-advance the queue.
+function observeOutOfBandFall(u, ev) {
+  if (ev.kind !== 'revenge' || phase === 'over') return;
+  if (checkEnd()) return;
+  if (queue[qi] === u && phase === 'player') { uiTurn = false; endTurn(); }
 }
 // Cross-retaliation (Jonah's spec): hurt the beast and the captain answers,
 // hurt the captain and the beast answers. The revenge is a FIXED amount —
@@ -4341,11 +4366,17 @@ function queueRetaliation(victim, sourceId) {
   if (!partner && SOLO_REVENGE && victim.alive) partner = victim;  // the berserk survivor avenges itself
   const target = unitById(sourceId);
   if (!partner || !target || !target.alive) return;
+  // Jonah's ruling: one reprisal per avenger per provocation — a survivor
+  // whose partner just fell never fires its partner's reprisal AND its own
+  // from the same burst. The flag clears when the stone lands or aborts.
+  if (partner.reprisalPending) return;
+  partner.reprisalPending = true;
   later(() => {
-    if (!partner.alive || !target.alive || phase === 'over') return;
+    if (!partner.alive || !target.alive || phase === 'over') { partner.reprisalPending = false; return; }
     faceToward(partner, target.x, target.z);
     const land = () => {
-      if (!target.alive) return;
+      partner.reprisalPending = false;
+      if (!target.alive || phase === 'over') return;   // never land under the outcome overlay
       // A berserk avenger's grief doubles the reprisal along with its attacks.
       const dmg = Math.round(REVENGE_DMG * (partner.berserk ? BERSERK_MULT : 1));
       applyDamage(target, dmg, '#ffa060', null, 'revenge');
@@ -4597,10 +4628,37 @@ function fcRow(u, loss, self) {
     `${fcBar(u, loss, self)}<div class="fcHp">${Math.max(0, u.hp)} <span class="to">&#8594; ${after}</span></div></div>`;
 }
 function fcMid(num, lab) { return `<div class="fcMid"><div class="num">${num}</div><div class="lab">${lab}</div></div>`; }
+// What striking a bonded enemy will cost the ATTACKER. Mirrors
+// queueRetaliation exactly — fixed revenge, one reprisal per avenger
+// (Jonah's rule), berserk doubling — so the panel never lies. Where the
+// outcome depends on whether this hit kills (berserk onset, or the last
+// survivor's self-revenge), the roll range decides: certain outcomes show
+// one number, uncertain ones show the honest range.
+function forecastRevenge(att, tgt) {
+  const none = { lo: 0, hi: 0 };
+  if (!WARBELL) return none;
+  const bonded = cls => cls === 'champion' || cls === 'beast';
+  if (!bonded(tgt.cls)) return none;
+  const r = fcRange(att, tgt);
+  const base = REVENGE_DMG, hot = Math.round(REVENGE_DMG * BERSERK_MULT);
+  const partner = units.find(v => v.alive && v.id !== tgt.id && bonded(v.cls));
+  if (partner) {
+    if (partner.berserk || r.lo >= tgt.hp) return { lo: hot, hi: hot };
+    return { lo: base, hi: r.hi >= tgt.hp ? hot : base };
+  }
+  if (!SOLO_REVENGE || r.lo >= tgt.hp) return none;   // a dead last-survivor avenges nothing
+  const solo = tgt.berserk ? hot : base;
+  return { lo: r.hi >= tgt.hp ? 0 : solo, hi: solo };
+}
 function showForecast(kind, att, tgt) {
   let html = fcCard(att, 'att');
   if (kind === 'attack') {
     const r = fcRange(att, tgt);
+    const rev = forecastRevenge(att, tgt);
+    if (rev.hi > 0) {
+      html = fcCard(att, 'att', rev.hi, true) +
+        fcMid(rev.lo === rev.hi ? `−${rev.hi}` : `−${rev.lo}–${rev.hi}`, 'REVENGE');
+    }
     html += fcMid(r.lo === r.hi ? r.lo : `${r.lo}–${r.hi}`, 'DAMAGE') + fcCard(tgt, 'tgt', r.mid);
   } else if (kind === 'anger') {
     const r = fcRange(att, tgt, { marked: true });   // hypothetical marked follow-up
@@ -5015,7 +5073,11 @@ function runFx(b) {
     settled = true; dlgFx = null;
     if (++dlgAt >= dlgLines.length) endDialogue(); else drawBeat();
   };
-  const handle = b.run(finish) || {};
+  // dlgFx is installed BEFORE the beat runs: a beat that finishes
+  // synchronously must not have a stale dlgFx written over its successor,
+  // and a beat that throws must advance rather than silently skipping a
+  // non-skippable beat with its staging half-applied (2026-07-31 review).
+  let handle = {};
   dlgFx = {
     skippable: b.skippable !== false,
     skip: () => {
@@ -5024,6 +5086,12 @@ function runFx(b) {
       finish();
     },
   };
+  try {
+    handle = b.run(finish) || {};
+  } catch (err) {
+    console.error('fx beat failed:', err);
+    finish();
+  }
 }
 function clearDialogue() {
   dlgLines = null; dlgFx = null; dlgSpeaker = null; dlgPortraitKey = null;
@@ -5780,7 +5848,7 @@ function cueBattleMusic() { musicHeld = false; startMusic(); }
 // A cast-bell strike, synthesized: a handful of inharmonic partials with
 // exponential decay. No audio asset exists or is needed for this.
 function chimeBell() {
-  if (!actx || actx.state !== 'running') return;
+  if (!actx || actx.state !== 'running' || muted) return;   // the M toggle covers every cue
   const t0 = actx.currentTime;
   const out = actx.createGain();
   out.gain.value = 0.22;
@@ -6740,7 +6808,12 @@ function animate() {
     const sp = document.getElementById('splash');
     if (sp) {
       sp.classList.add('run');
-      Promise.all([assetsReady, new Promise(res => setTimeout(res, SPLASH_FLOOR))]).then(() => {
+      Promise.all([assetsReady, new Promise(res => setTimeout(res, SPLASH_FLOOR))]).catch(err => {
+        // The loaders themselves always settle; only a JS exception in their
+        // consumer code can reject. The card must still open — a logged
+        // partial-art start beats an opaque page forever.
+        console.error('asset readiness rejected:', err);
+      }).then(() => {
         sp.classList.add('ready');
         sp.addEventListener('pointerdown', () => openFromSplash(sp), { once: true });
         startMusic();                         // autoplay where permitted

@@ -66,11 +66,14 @@ export function applyDamageState(unit, amount, kind = 'attack', sourceId = null)
   if (unit.hp <= 0 && wasAlive) {
     unit.alive = false;
     unit.aimed = false;
+    // Fall events carry the damage kind so a consumer can tell an in-band
+    // fall (attack/poison/cry, whose turn flow handles the ending) from an
+    // out-of-band one (revenge) that nothing else observes.
     if (unit.downable) {
       unit.downed = true;
-      events.push({ type: 'unitDowned', unitId: unit.id });
+      events.push({ type: 'unitDowned', unitId: unit.id, kind });
     } else {
-      events.push({ type: 'unitDefeated', unitId: unit.id });
+      events.push({ type: 'unitDefeated', unitId: unit.id, kind });
     }
   }
   return events;
