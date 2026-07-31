@@ -1,0 +1,5 @@
+# Nothing here is part of a published site; keeping them untracked stops an
+# accidental `git add -A` from publishing local editor and interpreter debris.
+.DS_Store
+*.pyc
+__pycache__/
