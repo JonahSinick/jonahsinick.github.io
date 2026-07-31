@@ -1,0 +1,1505 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "art/sprites",
+  "maxHeight": 256,
+  "entries": [
+    {
+      "name": "cassien",
+      "pose": "front",
+      "file": "cassien_front.png",
+      "source": "art/sprites/cassien_front.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back",
+      "file": "cassien_back.png",
+      "source": "art/sprites/cassien_back.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side",
+      "file": "cassien_side.png",
+      "source": "art/sprites/cassien_side.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk1",
+      "file": "cassien_front_walk1.png",
+      "source": "art/sprites/cassien_front_walk1.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk2",
+      "file": "cassien_front_walk2.png",
+      "source": "art/sprites/cassien_front_walk2.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk3",
+      "file": "cassien_front_walk3.png",
+      "source": "art/sprites/cassien_front_walk3.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk4",
+      "file": "cassien_front_walk4.png",
+      "source": "art/sprites/cassien_front_walk4.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk5",
+      "file": "cassien_front_walk5.png",
+      "source": "art/sprites/cassien_front_walk5.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk6",
+      "file": "cassien_front_walk6.png",
+      "source": "art/sprites/cassien_front_walk6.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk7",
+      "file": "cassien_front_walk7.png",
+      "source": "art/sprites/cassien_front_walk7.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "front_walk8",
+      "file": "cassien_front_walk8.png",
+      "source": "art/sprites/cassien_front_walk8.png",
+      "sourceSize": [
+        896,
+        1024
+      ],
+      "size": [
+        224,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk1",
+      "file": "cassien_back_walk1.png",
+      "source": "art/sprites/cassien_back_walk1.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk2",
+      "file": "cassien_back_walk2.png",
+      "source": "art/sprites/cassien_back_walk2.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk3",
+      "file": "cassien_back_walk3.png",
+      "source": "art/sprites/cassien_back_walk3.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk4",
+      "file": "cassien_back_walk4.png",
+      "source": "art/sprites/cassien_back_walk4.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk5",
+      "file": "cassien_back_walk5.png",
+      "source": "art/sprites/cassien_back_walk5.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk6",
+      "file": "cassien_back_walk6.png",
+      "source": "art/sprites/cassien_back_walk6.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk7",
+      "file": "cassien_back_walk7.png",
+      "source": "art/sprites/cassien_back_walk7.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "back_walk8",
+      "file": "cassien_back_walk8.png",
+      "source": "art/sprites/cassien_back_walk8.png",
+      "sourceSize": [
+        817,
+        1024
+      ],
+      "size": [
+        204,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk1",
+      "file": "cassien_side_walk1.png",
+      "source": "art/sprites/cassien_side_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk2",
+      "file": "cassien_side_walk2.png",
+      "source": "art/sprites/cassien_side_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk3",
+      "file": "cassien_side_walk3.png",
+      "source": "art/sprites/cassien_side_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk4",
+      "file": "cassien_side_walk4.png",
+      "source": "art/sprites/cassien_side_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk5",
+      "file": "cassien_side_walk5.png",
+      "source": "art/sprites/cassien_side_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk6",
+      "file": "cassien_side_walk6.png",
+      "source": "art/sprites/cassien_side_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk7",
+      "file": "cassien_side_walk7.png",
+      "source": "art/sprites/cassien_side_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "cassien",
+      "pose": "side_walk8",
+      "file": "cassien_side_walk8.png",
+      "source": "art/sprites/cassien_side_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front",
+      "file": "brecht_front.png",
+      "source": "art/sprites/brecht_front.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back",
+      "file": "brecht_back.png",
+      "source": "art/sprites/brecht_back.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "side",
+      "file": "brecht_side.png",
+      "source": "art/sprites/brecht_side.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk1",
+      "file": "brecht_front_walk1.png",
+      "source": "art/sprites/brecht_front_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk2",
+      "file": "brecht_front_walk2.png",
+      "source": "art/sprites/brecht_front_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk3",
+      "file": "brecht_front_walk3.png",
+      "source": "art/sprites/brecht_front_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk4",
+      "file": "brecht_front_walk4.png",
+      "source": "art/sprites/brecht_front_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk5",
+      "file": "brecht_front_walk5.png",
+      "source": "art/sprites/brecht_front_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk6",
+      "file": "brecht_front_walk6.png",
+      "source": "art/sprites/brecht_front_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk7",
+      "file": "brecht_front_walk7.png",
+      "source": "art/sprites/brecht_front_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "front_walk8",
+      "file": "brecht_front_walk8.png",
+      "source": "art/sprites/brecht_front_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk1",
+      "file": "brecht_back_walk1.png",
+      "source": "art/sprites/brecht_back_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk2",
+      "file": "brecht_back_walk2.png",
+      "source": "art/sprites/brecht_back_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk3",
+      "file": "brecht_back_walk3.png",
+      "source": "art/sprites/brecht_back_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk4",
+      "file": "brecht_back_walk4.png",
+      "source": "art/sprites/brecht_back_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk5",
+      "file": "brecht_back_walk5.png",
+      "source": "art/sprites/brecht_back_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk6",
+      "file": "brecht_back_walk6.png",
+      "source": "art/sprites/brecht_back_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk7",
+      "file": "brecht_back_walk7.png",
+      "source": "art/sprites/brecht_back_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "back_walk8",
+      "file": "brecht_back_walk8.png",
+      "source": "art/sprites/brecht_back_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "side_walk1",
+      "file": "brecht_side_walk1.png",
+      "source": "art/sprites/brecht_side_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "brecht",
+      "pose": "side_walk2",
+      "file": "brecht_side_walk2.png",
+      "source": "art/sprites/brecht_side_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front",
+      "file": "seira_front.png",
+      "source": "art/sprites/seira_front.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back",
+      "file": "seira_back.png",
+      "source": "art/sprites/seira_back.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "side",
+      "file": "seira_side.png",
+      "source": "art/sprites/seira_side.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk1",
+      "file": "seira_front_walk1.png",
+      "source": "art/sprites/seira_front_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk2",
+      "file": "seira_front_walk2.png",
+      "source": "art/sprites/seira_front_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk3",
+      "file": "seira_front_walk3.png",
+      "source": "art/sprites/seira_front_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk4",
+      "file": "seira_front_walk4.png",
+      "source": "art/sprites/seira_front_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk5",
+      "file": "seira_front_walk5.png",
+      "source": "art/sprites/seira_front_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk6",
+      "file": "seira_front_walk6.png",
+      "source": "art/sprites/seira_front_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk7",
+      "file": "seira_front_walk7.png",
+      "source": "art/sprites/seira_front_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "front_walk8",
+      "file": "seira_front_walk8.png",
+      "source": "art/sprites/seira_front_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk1",
+      "file": "seira_back_walk1.png",
+      "source": "art/sprites/seira_back_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk2",
+      "file": "seira_back_walk2.png",
+      "source": "art/sprites/seira_back_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk3",
+      "file": "seira_back_walk3.png",
+      "source": "art/sprites/seira_back_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk4",
+      "file": "seira_back_walk4.png",
+      "source": "art/sprites/seira_back_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk5",
+      "file": "seira_back_walk5.png",
+      "source": "art/sprites/seira_back_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk6",
+      "file": "seira_back_walk6.png",
+      "source": "art/sprites/seira_back_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk7",
+      "file": "seira_back_walk7.png",
+      "source": "art/sprites/seira_back_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "back_walk8",
+      "file": "seira_back_walk8.png",
+      "source": "art/sprites/seira_back_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "side_walk1",
+      "file": "seira_side_walk1.png",
+      "source": "art/sprites/seira_side_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "seira",
+      "pose": "side_walk2",
+      "file": "seira_side_walk2.png",
+      "source": "art/sprites/seira_side_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front",
+      "file": "miner_front.png",
+      "source": "art/sprites/miner_front.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back",
+      "file": "miner_back.png",
+      "source": "art/sprites/miner_back.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "down",
+      "file": "miner_down.png",
+      "source": "art/sprites/miner_down.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk1",
+      "file": "miner_front_walk1.png",
+      "source": "art/sprites/miner_front_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk2",
+      "file": "miner_front_walk2.png",
+      "source": "art/sprites/miner_front_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk3",
+      "file": "miner_front_walk3.png",
+      "source": "art/sprites/miner_front_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk4",
+      "file": "miner_front_walk4.png",
+      "source": "art/sprites/miner_front_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk5",
+      "file": "miner_front_walk5.png",
+      "source": "art/sprites/miner_front_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk6",
+      "file": "miner_front_walk6.png",
+      "source": "art/sprites/miner_front_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk7",
+      "file": "miner_front_walk7.png",
+      "source": "art/sprites/miner_front_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "front_walk8",
+      "file": "miner_front_walk8.png",
+      "source": "art/sprites/miner_front_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk1",
+      "file": "miner_back_walk1.png",
+      "source": "art/sprites/miner_back_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk2",
+      "file": "miner_back_walk2.png",
+      "source": "art/sprites/miner_back_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk3",
+      "file": "miner_back_walk3.png",
+      "source": "art/sprites/miner_back_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk4",
+      "file": "miner_back_walk4.png",
+      "source": "art/sprites/miner_back_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk5",
+      "file": "miner_back_walk5.png",
+      "source": "art/sprites/miner_back_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk6",
+      "file": "miner_back_walk6.png",
+      "source": "art/sprites/miner_back_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk7",
+      "file": "miner_back_walk7.png",
+      "source": "art/sprites/miner_back_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "miner",
+      "pose": "back_walk8",
+      "file": "miner_back_walk8.png",
+      "source": "art/sprites/miner_back_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front",
+      "file": "alchemist_front.png",
+      "source": "art/sprites/alchemist_front.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back",
+      "file": "alchemist_back.png",
+      "source": "art/sprites/alchemist_back.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "down",
+      "file": "alchemist_down.png",
+      "source": "art/sprites/alchemist_down.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk1",
+      "file": "alchemist_front_walk1.png",
+      "source": "art/sprites/alchemist_front_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk2",
+      "file": "alchemist_front_walk2.png",
+      "source": "art/sprites/alchemist_front_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk3",
+      "file": "alchemist_front_walk3.png",
+      "source": "art/sprites/alchemist_front_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk4",
+      "file": "alchemist_front_walk4.png",
+      "source": "art/sprites/alchemist_front_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk5",
+      "file": "alchemist_front_walk5.png",
+      "source": "art/sprites/alchemist_front_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk6",
+      "file": "alchemist_front_walk6.png",
+      "source": "art/sprites/alchemist_front_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk7",
+      "file": "alchemist_front_walk7.png",
+      "source": "art/sprites/alchemist_front_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "front_walk8",
+      "file": "alchemist_front_walk8.png",
+      "source": "art/sprites/alchemist_front_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk1",
+      "file": "alchemist_back_walk1.png",
+      "source": "art/sprites/alchemist_back_walk1.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk2",
+      "file": "alchemist_back_walk2.png",
+      "source": "art/sprites/alchemist_back_walk2.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk3",
+      "file": "alchemist_back_walk3.png",
+      "source": "art/sprites/alchemist_back_walk3.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk4",
+      "file": "alchemist_back_walk4.png",
+      "source": "art/sprites/alchemist_back_walk4.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk5",
+      "file": "alchemist_back_walk5.png",
+      "source": "art/sprites/alchemist_back_walk5.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk6",
+      "file": "alchemist_back_walk6.png",
+      "source": "art/sprites/alchemist_back_walk6.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk7",
+      "file": "alchemist_back_walk7.png",
+      "source": "art/sprites/alchemist_back_walk7.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    },
+    {
+      "name": "alchemist",
+      "pose": "back_walk8",
+      "file": "alchemist_back_walk8.png",
+      "source": "art/sprites/alchemist_back_walk8.png",
+      "sourceSize": [
+        768,
+        1024
+      ],
+      "size": [
+        192,
+        256
+      ]
+    }
+  ]
+}
