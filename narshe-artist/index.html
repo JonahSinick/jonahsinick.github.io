@@ -84,16 +84,18 @@
     <div class="err" id="err">Incorrect password.</div>
   </form>
 <script>
-  const HASH = '5574c2ae67218d5e9845b7d688129dcf2773cee36619b42c2541ecdac49441e6';
-  const SALT = ':narshe-gate-salt-2026';
+  // The folder name is derived from the password and appears nowhere in this
+  // page; VERIFY uses a different salt, so it reveals nothing about the folder.
+  const VERIFY = '01c928a6e9ed3e0a0e78f93d314bae36c9827dd3fbdd46e82c048e25196a12b7';
+  const sha = async (s) => {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  };
   document.getElementById('gate').addEventListener('submit', async (e) => {
     e.preventDefault();
     const pw = document.getElementById('pw').value.trim();
-    const data = new TextEncoder().encode(pw + SALT);
-    const buf = await crypto.subtle.digest('SHA-256', data);
-    const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    if (hex === HASH) {
-      location.href = './' + hex.slice(0, 16) + '/';
+    if (await sha(pw + ':narshe-verify-salt-2026') === VERIFY) {
+      location.href = './' + (await sha(pw + ':narshe-gate-salt-2026')).slice(0, 16) + '/';
     } else {
       document.getElementById('err').classList.add('show');
     }
