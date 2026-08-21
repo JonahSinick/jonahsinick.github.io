@@ -1,0 +1,43 @@
+[
+  {
+    "speaker": "Brecht",
+    "contains": "Speaking of songbeasts",
+    "file": "brecht_prejudice.png",
+    "frame": { "scale": 1.12, "x": 0, "y": 4 }
+  },
+  {
+    "speaker": "Cassien",
+    "contains": "Hold your tongue",
+    "file": "cassien_rebuke.png",
+    "frame": { "scale": 1, "x": 0, "y": 0 },
+    "battle": "narshe-gate"
+  },
+  {
+    "speaker": "Cassien",
+    "contains": "We are representatives of an empire",
+    "file": "cassien_unity.png",
+    "frame": { "scale": 1, "x": 0, "y": 0 },
+    "battle": "narshe-gate"
+  },
+  {
+    "speaker": "Seira",
+    "contains": "You'll see. I'll do my duty",
+    "file": "seira_duty.png",
+    "frame": { "scale": 1.1, "x": 0, "y": 3 },
+    "battle": "narshe-gate"
+  },
+  {
+    "speaker": "Second Guard",
+    "contains": "My girl's been happier",
+    "file": "guard_daughter.png",
+    "frame": { "scale": 1, "x": 0, "y": 0 },
+    "battle": "narshe-gate"
+  },
+  {
+    "speaker": "Town Guard",
+    "contains": "Then your orders don't apply here",
+    "file": "guard_independence.png",
+    "frame": { "scale": 1, "x": 0, "y": 0 },
+    "battle": "narshe-gate"
+  }
+]

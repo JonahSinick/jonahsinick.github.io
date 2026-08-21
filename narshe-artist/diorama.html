@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Narshe — Snowy Mining Town Diorama</title>
+<link rel="stylesheet" href="diorama.css">
+</head>
+<body>
+<div id="app"></div>
+<div id="vignette"></div>
+<div id="splash"><span>NARSHE</span><div class="loadbar" role="progressbar" aria-label="Loading"
+  aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="fill"></i></div></div>
+<div id="controls">
+  <div class="btn-wrap">
+    <button class="rot-btn" id="rotCCW" title="Rotate counterclockwise (Q)">⟲</button>
+    <div class="hint">Q</div>
+  </div>
+  <div class="btn-wrap">
+    <button class="rot-btn" id="rotCW" title="Rotate clockwise (E)">⟳</button>
+    <div class="hint">E</div>
+  </div>
+  <div class="btn-wrap">
+    <button class="rot-btn" id="tacBtn" title="Toggle battlefield squares (T)">⊞</button>
+    <div class="hint">T</div>
+  </div>
+</div>
+
+<div id="turnstrip" class="panel">
+  <div class="hdr">TURN ORDER</div>
+  <div id="chips"></div>
+</div>
+<div id="unitpanel">
+  <img class="upFace" alt="">
+  <div class="upBody">
+    <div class="upTop"><span class="upName caps"></span><span class="upTag"></span></div>
+    <div class="upRole"></div>
+    <div class="upHpRow"><div class="upBar"><div class="fill"></div></div><span class="upHp"></span></div>
+    <div class="upTp"></div>
+    <div class="upStatus"></div>
+  </div>
+</div>
+<!-- `pre` from the very first frame: the bar has no acting unit to describe
+     until round 1, and `refreshButtons` -- which is what normally maintains
+     this class -- does not run during the opening. Starting dimmed-but-present
+     is what put a ghosted action menu over the approach to the gate. -->
+<div id="actionbar" class="panel off pre">
+  <div id="tp" title="Turn Points — +1 at the start of each turn, cap 5">
+    <span class="lab">TP</span><span class="pips"></span>
+  </div>
+  <div class="sep"></div>
+  <button class="act-btn" id="btnMove">Move</button>
+  <button class="act-btn hidden" id="btnUndo" title="Return to where this unit started the turn (U)">&#x21A9; Undo</button>
+  <button class="act-btn" id="btnAttack">Attack</button>
+  <button class="act-btn" id="btnWait">Wait</button>
+  <!-- Everything from here right costs turn points (Jonah, playtest
+       2026-08-02): the free actions group on the left, the priced ones on the
+       right, with Defend adjacent to the abilities it now competes with. The
+       keyboard cursor reads this same DOM order, so the two never disagree. -->
+  <div class="sep" id="costSep"></div>
+  <button class="act-btn" id="btnDefend">Defend</button>
+  <div id="abils"></div>
+</div>
+<div id="abilTip" role="tooltip"></div>
+<div id="forecast"></div>
+<div id="audioWrap">
+  <div class="btn-wrap">
+    <button class="rot-btn" id="audioBtn" title="Mute / unmute music (M)">♪</button>
+    <div class="hint">M</div>
+  </div>
+</div>
+<div id="bark"></div>
+<div id="dlg">
+  <div class="dpanel">
+    <div class="tail up"></div>
+    <div class="dport">
+      <div class="spk caps"></div>
+      <div class="facecrop"><img alt=""></div>
+    </div>
+    <div class="dmain">
+      <div class="ln"></div>
+      <div class="adv">CLICK OR SPACE</div>
+    </div>
+  </div>
+  <div class="npanel">
+    <div class="ntext"></div>
+    <div class="adv">CLICK OR SPACE</div>
+  </div>
+  <div class="tbcard">
+    <div class="w">To Be Continued</div>
+    <div class="adv">CLICK OR SPACE</div>
+  </div>
+</div>
+<div id="fadeout"></div>
+<div id="whiteout"></div>
+<div id="overlay">
+  <div class="word"></div>
+  <button class="rst">Restart</button>
+</div>
+<div id="exploreHint">
+  BATTLE WON · EXPLORE AS SEIRA ·
+  <span class="keys">CLICK THE GROUND OR HOLD WASD / ARROWS</span>
+</div>
+
+<script type="importmap">
+  { "imports": {
+    "three": "./node_modules/three/build/three.module.js",
+    "three/addons/": "./node_modules/three/examples/jsm/"
+  } }
+</script>
+<script type="module" src="src/main.mjs"></script>
+</body>
+</html>
