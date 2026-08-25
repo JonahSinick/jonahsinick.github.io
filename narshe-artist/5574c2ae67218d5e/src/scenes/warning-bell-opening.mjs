@@ -397,7 +397,7 @@ export function createWarningBellOpening(context) {
     const seira = byName('Seira');
     return [
       { kind: 'fx', skippable: false, run: finish => warbellBellEntrance(finish) },
-      { kind: 'line', who: 'Ragna', text: 'Ha! Would you look at that — the Empire feeds us now! Three soldiers, armor and all. Skarn loves the crunchy ones.' },
+      { kind: 'line', who: 'Ragna', text: 'Ha! Would you look at that – the Empire feeds us now! Three soldiers, armor and all. Skarn loves the crunchy ones.' },
       { kind: 'line', who: 'Seira', text: 'Let me open. Mournful Cry answers both at once.' },
       { kind: 'line', who: 'Cassien', text: 'Seira, hold position—' },
       { kind: 'fx', skippable: false, run: finish => warbellScriptedCry(seira, finish) },

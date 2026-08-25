@@ -259,7 +259,7 @@ export function createBattleEvents({
     floatText('BERSERK', tileCenter(u.x, u.z).add(new THREE.Vector3(0, 2.05, 0)), '#ff5030');
     const RVP = 'art/runtime/review/bonded_defender_cragbeast/portraits/';
     bark(u,
-      u.cls === 'champion' ? "SKARN—! ...I'll break every one of you." : 'RRRAAAGH—!',
+      u.cls === 'champion' ? "SKARN!! I'LL BREAK EVERY ONE OF YOU!!" : 'RRRAAAGH—!',
       RVP + (u.cls === 'champion'
         ? 'defender_type8_aggressive_enraged_candidate.png'
         : 'cragbeast_enraged_candidate.png'));
