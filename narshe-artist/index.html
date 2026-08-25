@@ -95,7 +95,9 @@
     e.preventDefault();
     const pw = document.getElementById('pw').value.trim();
     if (await sha(pw + ':narshe-verify-salt-2026') === VERIFY) {
-      location.href = './' + (await sha(pw + ':narshe-gate-salt-2026')).slice(0, 16) + '/';
+      // Forward the query string so links like ?battle=warningbell (skip to
+      // the second battle, in the mines) survive the password gate.
+      location.href = './' + (await sha(pw + ':narshe-gate-salt-2026')).slice(0, 16) + '/' + location.search;
     } else {
       document.getElementById('err').classList.add('show');
     }
