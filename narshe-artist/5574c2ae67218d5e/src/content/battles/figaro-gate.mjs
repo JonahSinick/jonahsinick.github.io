@@ -3,10 +3,11 @@
  *
  * The first two encounters are advances: the party crosses ground toward
  * something. This one is the inverse, and that is the whole point of adding it —
- * the party starts on the objective, holds the raised terrace in front of the
- * keep door, and the attackers arrive through the breached gatehouse and over
- * two wall ladders. Nothing here is new mechanics: it is existing characters on
- * a new map with the terrain flipped in the defenders' favour.
+ * the party starts on the objective, holds the gate at the top of the ramp, and
+ * the attackers cross the open desert past the wrecked automaton line, then
+ * come up the walled ramp throat or the two wall ladders. Nothing here is new
+ * mechanics: it is existing characters on a new map with the terrain flipped in
+ * the defenders' favour.
  *
  * The courtyard's set dressing (towers, portcullis, banners, torches, the warm
  * dusk grade) is `src/render/figaro-scenery.mjs` and the `figaro` mood in
@@ -22,8 +23,8 @@ export const figaroGateBattle = {
   query: 'figaro',
   /** Entry-card word. Doubles as the art-preload gate's label. */
   title: 'FIGARO CASTLE',
-  /** Keep at z = 0, breached gate at z = 18; see `maps/figaro-courtyard.mjs`. */
-  grid: { width: 17, depth: 19 },
+  /** Keep at z = 0, open desert to z = 22; see `maps/figaro-courtyard.mjs`. */
+  grid: { width: 17, depth: 23 },
   /**
    * Its own grading rather than the town's: this is a warm desert dusk, not
    * Narshe's overcast snow. `scene-mood.mjs` owns the rig; the battle world it
@@ -100,32 +101,33 @@ export const figaroGateBattle = {
   /** No reactive mechanics: the bonded pair's bond belongs to the bell. */
   reactions: [],
   /**
-   * The imperial trio on the terrace, five Narshe militia storming it. Existing
-   * character records only, so every number here is one that already shipped;
-   * the deployment is the only thing this battle states.
+   * The imperial trio at the gate, five Narshe militia storming it across the
+   * sand. Existing character records only, so every number here is one that
+   * already shipped; the deployment is the only thing this battle states.
    *
-   * WHERE THEY STAND IS THE ENCOUNTER. The trio holds the keep door: the two
-   * melee-capable imperials on the parapet line either side of the carpet, and
-   * Brecht behind them on the runner, where his bow clears the parapet and
-   * nothing walls him in. That last part is a real constraint and not a
-   * flourish — movement is four-neighbour, so a line abreast on the raised
-   * terrace can pin its own archer against his own party.
+   * WHERE THEY STAND IS THE ENCOUNTER. The trio holds the top of the ramp: the
+   * two melee-capable imperials at the throat's mouth either side of the
+   * runner, and Brecht behind them on the carpet under the gate arch, where his
+   * bow covers the whole throat and nothing walls him in. That last part is a
+   * real constraint and not a flourish — movement is four-neighbour, so a line
+   * abreast on the high landing can pin its own archer against his own party.
    *
-   * Two bows come through the breach with an alchemist behind them, and one bow
-   * lands at the foot of each wall ladder — the flanks exist so that holding the
-   * centre stair is not the whole battle. The `tune` maps are the same knobs
-   * battle 1's militia read, so a sweep can re-field this line without a
-   * rebuild.
+   * The attackers enter from the deep desert: two bows and an alchemist on the
+   * axis, who must thread the wrecked automaton line for cover on the way in,
+   * and one bow toward each flank, where the wall ladders offer a way onto the
+   * terraces — the flanks exist so that holding the throat is not the whole
+   * battle. The `tune` maps are the same knobs battle 1's militia read, so a
+   * sweep can re-field this line without a rebuild.
    */
   roster: [
-    { character: 'cassien', x: 7, z: 3 },
-    { character: 'seira', x: 9, z: 3 },
-    { character: 'brecht', x: 8, z: 2 },
-    { character: 'miner-archer', name: 'Raider I', x: 7, z: 17, tune: { hp: 'ahp', atk: 'aatk' } },
-    { character: 'miner-archer', name: 'Raider II', x: 9, z: 17, tune: { hp: 'ahp', atk: 'aatk' } },
-    { character: 'alchemist', name: 'Raider Alchemist', x: 8, z: 16,
+    { character: 'cassien', x: 7, z: 4 },
+    { character: 'seira', x: 9, z: 4 },
+    { character: 'brecht', x: 8, z: 3 },
+    { character: 'miner-archer', name: 'Raider I', x: 7, z: 20, tune: { hp: 'ahp', atk: 'aatk' } },
+    { character: 'miner-archer', name: 'Raider II', x: 9, z: 20, tune: { hp: 'ahp', atk: 'aatk' } },
+    { character: 'alchemist', name: 'Raider Alchemist', x: 8, z: 21,
       tune: { hp: 'xhp', atk: 'xatk', move: 'xmv' } },
-    { character: 'miner-archer', name: 'Ladder Raider I', x: 1, z: 8, tune: { hp: 'ahp', atk: 'aatk' } },
-    { character: 'miner-archer', name: 'Ladder Raider II', x: 15, z: 11, tune: { hp: 'ahp', atk: 'aatk' } },
+    { character: 'miner-archer', name: 'Ladder Raider I', x: 2, z: 18, tune: { hp: 'ahp', atk: 'aatk' } },
+    { character: 'miner-archer', name: 'Ladder Raider II', x: 14, z: 18, tune: { hp: 'ahp', atk: 'aatk' } },
   ],
 };
